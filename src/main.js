@@ -527,7 +527,6 @@ async function ensureFamilyAccess(interactive = true) {
   // so the family loop can be exercised before wallet connection is wired up.
   if (!state.account) {
     createAccount();
-    grantTestBalance();
     save();
     refreshHud();
   }
@@ -1775,11 +1774,9 @@ function newDraft() {
 $('btn-build').addEventListener('click', () => {
   sfx.click();
   // TEST MODE: allow building without a connected wallet by creating a guest
-  // account on the fly (granted the 1M test balance) instead of forcing a
-  // wallet connection first.
+  // account on the fly instead of forcing a wallet connection first.
   if (!state.account) {
     createAccount();
-    grantTestBalance();
     save();
     refreshHud();
   }
@@ -3331,15 +3328,16 @@ function backfillBusinesses() {
   }
 }
 
-/** Test grant: every player gets 1,000,000 coins for testing marketplace and gameplay.
- *  Idempotent: keyed by test-balance-v1 so multiple loads don't duplicate. */
-function grantTestBalance() {
+/** One-time reset: reverse the 1,000,000-coin test grant that older builds
+ *  issued, so every account starts at zero again. Idempotent — the reversal
+ *  is keyed, so it runs at most once per account and never double-reverses. */
+function resetTestBalance() {
   if (!state.account) return;
-  const testKey = `test_balance_v1_${state.account.id}`;
-  issueCoins(state.account.id, 1_000_000, { 
-    signature: testKey, 
-    reason: 'test-balance-grant' 
-  });
+  const grantOpId = state.ledger.keys[`sig_test_balance_v1_${state.account.id}`];
+  if (!grantOpId) return;
+  const reversalKey = `reset_test_balance_v1_${state.account.id}`;
+  if (state.ledger.keys[reversalKey]) return;
+  reverseOperation(grantOpId, 'test-balance-reset', reversalKey);
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
@@ -3367,7 +3365,7 @@ async function boot() {
     save();
   }
   backfillBusinesses();
-  grantTestBalance();
+  resetTestBalance();
   reconcile(); // journal is the source of truth (task4 §9.5)
 
   const sharedWorldReady = await multiplayer.start();
