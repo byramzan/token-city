@@ -585,6 +585,9 @@ body {
   box-shadow: 0 4px 0 var(--shadow), 0 10px 24px rgba(30, 20, 5, 0.18);
   pointer-events: none;
 }
+/* The panel itself must not block the 3D canvas behind it, but its interactive
+   controls (the "Family & supplies" button) must still receive clicks. */
+.home-vitals .family-open { pointer-events: auto; }
 .home-vitals-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; margin-bottom: 5px; }
 .home-vitals-head span { font-size: 0.76rem; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .home-vitals-head strong { color: #0f7c70; font-size: 0.78rem; }
