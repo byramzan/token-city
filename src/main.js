@@ -522,12 +522,20 @@ function reviewAction({ title, body, label = 'Confirm', onConfirm }) {
 }
 
 async function ensureFamilyAccess(interactive = true) {
-  if (!state.account) throw new Error('Connect your wallet first.');
+  // TEST MODE: allow opening the family panel without a connected wallet.
+  // A guest account is created on the fly and unlocked with a demo access key,
+  // so the family loop can be exercised before wallet connection is wired up.
+  if (!state.account) {
+    createAccount();
+    grantTestBalance();
+    save();
+    refreshHud();
+  }
   const stored = familyAccessFor(state.account.id);
   if (stored) return stored;
   const wallet = activeWallet('loginWallet') || activeWallet('paymentWallet');
-  if (!wallet) throw new Error('Select a wallet first.');
-  if (wallet.provider === 'demo') return newDemoFamilyAccess(state.account.id);
+  // No wallet linked yet (guest/test session): use a demo access key.
+  if (!wallet || wallet.provider === 'demo') return newDemoFamilyAccess(state.account.id);
   if (!interactive) return '';
   // A deterministic signature derives a private capability that reconstructs
   // with the same wallet. It is never included in a public house document.
