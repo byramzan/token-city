@@ -1,0 +1,41 @@
+{
+  "name": "solanahomeproj",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "setup:test-wallets": "node scripts/setup-devnet-wallets.mjs",
+    "setup:test-pool": "node scripts/setup-devnet-pool.mjs",
+    "export:test-wallets": "node scripts/export-test-wallets.mjs",
+    "verify:multiplayer": "node scripts/verify-multiplayer.mjs",
+    "test": "node --test tests/*.test.js",
+    "verify:chain": "node scripts/verify-task8.mjs",
+    "verify:task7": "node scripts/verify-task7.mjs",
+    "compile:contracts": "node scripts/compileContracts.mjs",
+    "setup:testnet-wallets": "node scripts/setup-testnet-wallets.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/wallet-standard-wallet-adapter-base": "^1.1.5",
+    "@solana/web3.js": "^1.95.8",
+    "@wallet-standard/app": "^1.1.1",
+    "@walletconnect/ethereum-provider": "^2.24.0",
+    "buffer": "^6.0.3",
+    "convex": "^1.43.0",
+    "rpc-websockets": "^9.1.1",
+    "three": "^0.185.1",
+    "viem": "^2.56.3",
+    "vite": "^5.4.21"
+  },
+  "type": "module",
+  "devDependencies": {
+    "solc": "^0.8.36"
+  }
+}

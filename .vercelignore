@@ -1,0 +1,8 @@
+.token-city-solana.local.json
+.token-city-pool.local.json
+wallet-access
+.env*
+.vercel
+node_modules
+tests
+task*.md

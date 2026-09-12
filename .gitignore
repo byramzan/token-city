@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+package-lock.json
+.pnpm-lock.yaml
+
+# Environment
+.env.local
+.env.*.local
+.env.prod
+
+# Sensitive files
+.token-city-*.local.json
+wallet-access/
+.DS_Store
+
+# Build outputs
+dist/
+.next/
+.nuxt/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vercel
+.vercel/
+
+# Convex
+.convex/
+convex/_generated/
+
+# Temporary test files
+tmp_rovodev_*

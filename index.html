@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Token City — a cozy low-poly crypto town</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>" />
+  <link rel="stylesheet" href="/src/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="gl"></canvas>
+
+    <!-- Loading screen -->
+    <div id="loader" class="loader">
+      <div class="loader-sun"></div>
+      <div class="loader-cloud lc1"></div>
+      <div class="loader-cloud lc2"></div>
+      <div class="loader-inner">
+        <div class="loader-logo">Token <span class="accent">City</span></div>
+        <div class="loader-blocks"><span></span><span></span><span></span><span></span></div>
+        <div class="loader-bar"><div id="loader-fill"></div></div>
+        <div class="loader-hint">Paving streets, planting gardens…</div>
+      </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hud hidden">
+      <div class="hud-top">
+        <div class="hud-left">
+          <div class="logo"><span data-ic="home"></span>Token City</div>
+          <div class="stage-badge" id="stage-badge" title="The stage is shared by the whole town"></div>
+          <div class="town-stats">
+            <span class="chip chip-soft" id="chip-houses" title="Houses in town"></span>
+            <span class="chip chip-soft" id="chip-pop" title="Population"></span>
+          </div>
+        </div>
+        <div class="hud-right">
+          <button id="btn-network" class="network-pill hidden" tabindex="-1" aria-hidden="true">Devnet</button>
+          <button id="btn-sound" class="icon-btn" title="Sound"></button>
+          <div id="balances" class="balances hidden">
+            <span class="chip" id="chip-token" title="Project Token in the active payment wallet"></span>
+            <span class="chip" id="chip-coins" title="Available Game Coins (spendable & withdrawable)"></span>
+            <span class="chip chip-soft" id="chip-pending" title="Pending: sales inside the settlement hold"></span>
+            <span class="chip" id="chip-level" title="Your level"></span>
+          </div>
+          <button id="btn-wallet" class="btn btn-wallet"></button>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <div class="hint" id="hint">WASD to fly · Drag to rotate · Scroll to zoom · Click any house</div>
+        <div class="hud-actions">
+          <button id="btn-find" class="btn btn-ghost hidden"></button>
+          <button id="btn-fund" class="btn btn-ghost hidden"></button>
+          <button id="btn-build" class="btn btn-primary"></button>
+        </div>
+      </div>
+      <div id="home-vitals" class="home-vitals hidden">
+        <div class="home-vitals-head">
+          <span id="home-vitals-name">Home HP</span>
+          <strong id="home-vitals-score">—</strong>
+        </div>
+        <div id="home-vitals-bars" class="home-vitals-bars"></div>
+        <div id="home-vitals-status" class="home-vitals-status"></div>
+        <button id="btn-family" class="btn btn-ghost family-open" type="button">Family & supplies</button>
+      </div>
+      <button id="contract-address-copy" class="contract-address" type="button" title="Copy contract address">
+        <span>C/A</span><b id="contract-address-value">######</b>
+      </button>
+    </div>
+
+    <!-- House card -->
+    <div id="house-card" class="panel house-card hidden">
+      <button class="panel-close" data-close="house-card" data-ic="close"></button>
+      <div class="hc-name" id="hc-name">—</div>
+      <div class="hc-nick" id="hc-nick">—</div>
+      <div class="hc-rows" id="hc-rows"></div>
+      <div class="hc-needs" id="hc-needs"></div>
+      <div class="hc-actions">
+        <button id="hc-links" class="btn btn-ghost"></button>
+        <button id="hc-inside" class="btn btn-primary"></button>
+        <button id="hc-business" class="btn btn-ghost hidden"></button>
+        <button id="hc-budget" class="btn btn-ghost hidden"></button>
+        <button id="hc-family" class="btn btn-ghost hidden">Family & supplies</button>
+        <button id="hc-add-floor" class="btn btn-primary hidden">Add Floor</button>
+        <button id="hc-yard" class="btn btn-ghost hidden"></button>
+        <button id="hc-share" class="btn btn-ghost"></button>
+      </div>
+    </div>
+
+    <!-- NPC speech bubbles -->
+    <div id="bubbles"></div>
+
+    <!-- Link graph mode -->
+    <div id="graph-ui" class="graph-ui hidden">
+      <div class="graph-top">
+        <button id="graph-exit" class="btn btn-ghost"></button>
+        <div class="graph-title" id="graph-title"></div>
+        <span></span>
+      </div>
+      <div class="graph-panel">
+        <div class="graph-legend" id="graph-legend"></div>
+        <div class="graph-links" id="graph-links"></div>
+      </div>
+    </div>
+
+    <!-- Wallet connection modal (task4 §16) -->
+    <div id="modal-wallet" class="modal hidden">
+      <div class="modal-box">
+        <button class="panel-close" data-close="modal-wallet" data-ic="close"></button>
+        <h2><span data-ic="wallet"></span><span id="wallet-modal-title">Connect a wallet</span></h2>
+        <input id="wallet-search" class="text-input" type="text" placeholder="Search wallets…" autocomplete="off" />
+        <div class="wallet-discovery">
+          <span id="wallet-detected">Scanning browser extensions…</span>
+          <button id="wallet-refresh" type="button">Scan again</button>
+        </div>
+        <div class="wallet-list" id="wallet-list"></div>
+        <p class="muted wallet-footer" id="wallet-security-note">Connect the wallet that holds the configured token. Token City will never ask for your recovery phrase or private key.</p>
+        <p class="muted wallet-footer">Install links are shown separately and connecting never redirects away from the game.</p>
+      </div>
+    </div>
+
+    <!-- Account & linked wallets (task4 §15, §17) -->
+    <div id="modal-account" class="modal hidden">
+      <div class="modal-box wide">
+        <button class="panel-close" data-close="modal-account" data-ic="close"></button>
+        <h2><span data-ic="wallet"></span>Account</h2>
+        <div class="acct-balances" id="acct-balances"></div>
+        <div class="acct-goods" id="acct-goods"></div>
+        <h3 class="acct-h">Linked wallets <small id="acct-wcount"></small></h3>
+        <div class="acct-wallets" id="acct-wallets"></div>
+        <h3 class="acct-h">Robinhood Chain transfers</h3>
+        <div class="bud-history" id="acct-chain-history">No on-chain transfers yet.</div>
+        <div class="acct-actions">
+          <button id="acct-add-wallet" class="btn btn-ghost"></button>
+          <button id="acct-withdraw" class="btn btn-ghost"></button>
+          <button id="acct-disconnect" class="btn btn-ghost">Log out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Funding: Game Coins against Project Token (task4 §12, §14) -->
+    <div id="modal-fund" class="modal hidden">
+      <div class="modal-box">
+        <button class="panel-close" data-close="modal-fund" data-ic="close"></button>
+        <h2><span data-ic="swap"></span>Add Game Coins</h2>
+        <p class="muted" id="fund-note">Game Coins are issued only after the backend has independently confirmed your deposit on Robinhood Chain. The price follows the live market — the quote below expires.</p>
+        <div class="conv-balance" id="fund-chain-balances"></div>
+        <input id="fund-amount" type="number" min="1" placeholder="Game Coins amount" />
+        <div class="conv-quick">
+          <button data-amt="500">500</button><button data-amt="1000">1,000</button><button data-amt="2500">2,500</button>
+        </div>
+        <div class="quote-box hidden" id="fund-quote"></div>
+        <label class="field-label" for="fund-wallet">Pay from wallet</label>
+        <select id="fund-wallet" class="select-input"></select>
+        <ul class="conv-steps hidden" id="fund-steps">
+          <li>Creating one-time deposit quote</li>
+          <li>Connecting selected wallet</li>
+          <li>Approving the exact token amount</li>
+          <li>Sending the deposit transaction</li>
+          <li>Confirming on Robinhood Chain</li>
+          <li>Issuing Game Coins</li>
+        </ul>
+        <div class="muted" id="fund-state"></div>
+        <button id="fund-go" class="btn btn-primary">Get quote</button>
+      </div>
+    </div>
+
+    <!-- Withdrawal (task4 §13) -->
+    <div id="modal-withdraw" class="modal hidden">
+      <div class="modal-box">
+        <button class="panel-close" data-close="modal-withdraw" data-ic="close"></button>
+        <h2><span data-ic="swap"></span>Withdraw</h2>
+        <p class="muted">Available Game Coins convert back to the project token and are sent to a verified linked wallet on Robinhood Chain. No bridge to Ethereum is involved.</p>
+        <div class="conv-balance">Withdrawable: <b id="wd-avail">0</b></div>
+        <input id="wd-amount" type="number" min="1" placeholder="Game Coins amount" />
+        <div class="quote-box hidden" id="wd-quote"></div>
+        <div class="muted" id="wd-wallet-note"></div>
+        <button id="wd-go" class="btn btn-primary">Get quote</button>
+      </div>
+    </div>
+
+    <!-- Household budget (task4 §22) -->
+    <div id="modal-budget" class="modal hidden">
+      <div class="modal-box">
+        <button class="panel-close" data-close="modal-budget" data-ic="close"></button>
+        <h2>🏡 Household Budget</h2>
+        <p class="muted">Residents can spend only this allocated budget — never your withdrawable balance. Automatic spending is off by default.</p>
+        <div class="conv-balance">In budget: <b id="bud-balance">0</b> · Available: <b id="bud-avail">0</b></div>
+        <div class="bud-row">
+          <input id="bud-amount" type="number" min="1" placeholder="Amount" />
+          <button id="bud-fund" class="btn btn-ghost">Add</button>
+          <button id="bud-return" class="btn btn-ghost">Return</button>
+        </div>
+        <label class="check-row"><input type="checkbox" id="bud-auto" disabled /> All family purchases now require your confirmation</label>
+        <div class="bud-row">
+          <label class="field-label" for="bud-limit">Daily limit</label>
+          <input id="bud-limit" type="number" min="0" />
+          <span class="muted" id="bud-spent"></span>
+        </div>
+        <div class="bud-cats" id="bud-cats"></div>
+        <div class="bud-history" id="bud-history"></div>
+      </div>
+    </div>
+
+    <!-- Business purchase (task4 §19) -->
+    <div id="modal-bizbuy" class="modal hidden">
+      <div class="modal-box">
+        <button class="panel-close" data-close="modal-bizbuy" data-ic="close"></button>
+        <h2>🏪 Buy a Business</h2>
+        <p class="muted" id="bizbuy-note">The plot next to your house is reserved. A business is a separate purchase — pick a category that fits your architecture and preview it before paying.</p>
+        <div class="companion-list" id="bizbuy-list"></div>
+      </div>
+    </div>
+
+    <!-- Business management -->
+    <div id="modal-bizmanage" class="modal hidden">
+      <div class="modal-box wide">
+        <button class="panel-close" data-close="modal-bizmanage" data-ic="close"></button>
+        <h2 id="biz-title">Business</h2>
+        <div class="biz-stats" id="biz-stats"></div>
+        <div class="biz-products" id="biz-products"></div>
+        <div class="acct-actions">
+          <button id="biz-toggle" class="btn btn-ghost"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- User marketplace: buy approved goods from another player's business -->
+    <div id="modal-marketplace" class="modal hidden">
+      <div class="modal-box wide">
+        <button class="panel-close" data-close="modal-marketplace" data-ic="close"></button>
+        <h2 id="market-title">Marketplace</h2>
+        <p class="muted" id="market-note"></p>
+        <div class="biz-products" id="market-products"></div>
+      </div>
+    </div>
+
+    <div id="modal-family" class="modal hidden">
+      <div class="modal-box wide family-box">
+        <button class="panel-close" data-close="modal-family" data-ic="close"></button>
+        <h2 id="family-title">Your family</h2>
+        <div id="family-content" aria-live="polite"></div>
+      </div>
+    </div>
+    <div id="modal-review" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="review-title">
+      <div class="modal-box">
+        <button class="panel-close" data-close="modal-review" data-ic="close"></button>
+        <h2 id="review-title">Review</h2>
+        <div id="review-content"></div>
+        <p id="review-error" class="input-err" role="alert"></p>
+        <div class="acct-actions">
+          <button class="btn btn-ghost" data-close="modal-review">Cancel</button>
+          <button id="review-confirm" class="btn btn-primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden token operations console: ?token-console=1 in local development -->
+    <div id="modal-admin" class="modal hidden">
+      <div class="modal-box wide">
+        <button class="panel-close" data-close="modal-admin" data-ic="close"></button>
+        <h2>🔐 Token Operations <small class="muted-inline">hidden console</small></h2>
+        <div class="admin-grid" id="admin-grid"></div>
+        <div class="acct-actions">
+          <button id="admin-refresh-chain" class="btn btn-ghost">Reload chain configuration</button>
+          <button id="admin-save" class="btn btn-primary">Save configuration</button>
+        </div>
+        <div class="admin-wallet-checks" id="admin-wallet-checks"></div>
+        <div class="bud-history" id="admin-audit"></div>
+      </div>
+    </div>
+
+    <!-- Builder -->
+    <div id="builder" class="builder hidden">
+      <div class="builder-top">
+        <button id="builder-exit" class="btn btn-ghost"></button>
+        <div class="builder-steps" id="builder-steps"></div>
+        <div class="builder-right">
+          <button id="builder-daynight" class="icon-btn" title="Preview day / evening"></button>
+          <div class="builder-cost">Total: <b id="builder-total">0</b><span data-ic="gem"></span></div>
+        </div>
+      </div>
+      <div class="builder-panel">
+        <div class="builder-title" id="builder-title"></div>
+        <div class="builder-options" id="builder-options"></div>
+        <div class="builder-nav">
+          <button id="builder-prev" class="btn btn-ghost"></button>
+          <button id="builder-next" class="btn btn-primary"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interior editor (task5) -->
+    <div id="interior-ui" class="interior-ui hidden">
+      <div class="interior-top">
+        <button id="interior-exit" class="btn btn-ghost"></button>
+        <div class="interior-name" id="interior-name"></div>
+        <button id="interior-edit" class="btn btn-primary hidden"></button>
+      </div>
+      <div class="interior-side">
+        <div class="floor-tabs" id="floor-tabs"></div>
+        <div class="editor-validation" id="editor-validation"></div>
+        <div class="view-modes" id="view-modes"></div>
+        <div class="edit-tools hidden" id="edit-tools">
+          <button id="ed-undo" class="icon-btn" title="Undo">↶</button>
+          <button id="ed-redo" class="icon-btn" title="Redo">↷</button>
+        </div>
+      </div>
+      <div class="obj-controls hidden" id="obj-controls">
+        <span id="obj-name"></span>
+        <button id="obj-rotate" class="btn btn-ghost">Rotate</button>
+        <button id="obj-reset" class="btn btn-ghost">Return to socket</button>
+        <button id="obj-remove" class="btn btn-ghost">Remove</button>
+      </div>
+      <div class="placement-review hidden" id="placement-review">
+        <div class="placement-review-copy">
+          <small>Preview on fixed socket</small>
+          <strong id="placement-review-name"></strong>
+          <span id="placement-review-spot"></span>
+        </div>
+        <button id="placement-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="placement-confirm" class="btn btn-primary">Confirm placement</button>
+      </div>
+      <div id="item-panel" class="item-panel hidden">
+        <div class="item-panel-head">
+          <span id="item-panel-title">Pick a slot</span>
+          <button class="panel-close" id="item-panel-close" data-ic="close"></button>
+        </div>
+        <div class="item-list" id="item-list"></div>
+      </div>
+    </div>
+
+    <div id="toasts" class="toasts"></div>
+  </div>
+  <script type="module" src="/src/bootstrap.js"></script>
+</body>
+</html>

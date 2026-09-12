@@ -1,0 +1,23 @@
+{
+  "buildCommand": "npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name VITE_CONVEX_URL",
+  "rewrites": [
+    { "source": "/token-admin.html", "destination": "/api/token-admin-page" },
+    { "source": "/token-admin", "destination": "/api/token-admin-page" }
+  ],
+  "headers": [
+    {
+      "source": "/token-admin.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ]
+}

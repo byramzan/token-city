@@ -1,0 +1,40 @@
+{
+  "renderer": "Three.js r185",
+  "drawCalls": 1112,
+  "triangles": 19338,
+  "geometries": 1447,
+  "textures": 112,
+  "shaderPrograms": 9,
+  "averageFrameMs": 9.19,
+  "p95FrameMs": 16.7,
+  "estimatedFps": 108.8,
+  "pixelRatio": 1.75,
+  "shadowMap": "PCF",
+  "sharedMaterials": 136,
+  "materialLibrary": {
+    "textureObjects": 93,
+    "sourceCanvases": 42,
+    "estimatedGpuMiB": 41.5,
+    "byKind": {
+      "grass": 9,
+      "pavers": 15,
+      "wood": 12,
+      "metal": 3,
+      "asphalt": 6,
+      "bark": 3,
+      "foliage": 3,
+      "stone": 12,
+      "roof": 6,
+      "brick": 6,
+      "ceramic": 3,
+      "plastic": 3,
+      "tech": 9,
+      "fabric": 3
+    }
+  },
+  "measurement": {
+    "viewport": "1280x720",
+    "browser": "Codex in-app Chromium",
+    "condition": "single active game tab; world fully loaded; 300-frame rolling sample"
+  }
+}

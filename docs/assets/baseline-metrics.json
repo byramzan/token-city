@@ -1,0 +1,13 @@
+{
+  "renderer": "Three.js r185",
+  "drawCalls": 1848,
+  "triangles": 31640,
+  "geometries": 1293,
+  "textures": 38,
+  "shaderPrograms": 8,
+  "averageFrameMs": 32.75,
+  "p95FrameMs": 33.5,
+  "estimatedFps": 30.5,
+  "pixelRatio": 2,
+  "shadowMap": "PCF"
+}
