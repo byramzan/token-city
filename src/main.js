@@ -3319,6 +3319,17 @@ function backfillBusinesses() {
   }
 }
 
+/** Test grant: every player gets 1,000,000 coins for testing marketplace and gameplay.
+ *  Idempotent: keyed by test-balance-v1 so multiple loads don't duplicate. */
+function grantTestBalance() {
+  if (!state.account) return;
+  const testKey = `test_balance_v1_${state.account.id}`;
+  issueCoins(state.account.id, 1_000_000, { 
+    signature: testKey, 
+    reason: 'test-balance-grant' 
+  });
+}
+
 // ── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
   applyStaticUi();
@@ -3344,6 +3355,7 @@ async function boot() {
     save();
   }
   backfillBusinesses();
+  grantTestBalance();
   reconcile(); // journal is the source of truth (task4 §9.5)
 
   const sharedWorldReady = await multiplayer.start();
