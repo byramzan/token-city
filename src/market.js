@@ -1,8 +1,8 @@
-// Demo market engine (task4 §4, §8, §12–§13).
-// The Project Token price follows a simulated bonding-curve/PumpSwap pool, so
-// the token-per-coin rate changes over time. Game Coins keep a stable unit
-// value; issuance always uses a protected quote (TWAP-ish smoothing, fee,
-// price impact, expiry) and actual net settlement — never a client screenshot.
+// Market engine (task4 §4, §8, §12–§13).
+// The Project Token converts at a FIXED rate: 100 tokens == 1 Game Coin, both
+// directions, no fee (server/conversion.js). Game Coins keep a stable unit
+// value; issuance always uses a protected quote (fixed price, expiry) and
+// actual net settlement — never a client screenshot.
 
 import { state, save, tokenMeta, activeWallet, dailyUsageOf } from './state.js';
 import { issueCoins, startWithdrawal, finishWithdrawal, cancelWithdrawal, balance, acct } from './ledger.js';
