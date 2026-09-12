@@ -16,10 +16,11 @@ export { spotPrice, twapPrice, CONVERSION_RULE_VERSION };
 
 function cfg() { return state.tokenConfig; }
 
-/** Quote: how many Project Tokens are needed to fund `coins` Game Coins. */
+/** Quote: how many Project Tokens are needed to fund `coins` Game Coins.
+ *  Deposits are fee-free; the conversion module owns the rate and fee policy. */
 export function quoteFunding(coins) {
   const c = cfg();
-  const priced = fundingTokensFor(coins, { feePct: c.feePct });
+  const priced = fundingTokensFor(coins);
   return {
     id: 'q_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     kind: 'fund',
@@ -35,10 +36,11 @@ export function quoteFunding(coins) {
   };
 }
 
-/** Quote: expected Project Token output for withdrawing `coins`. */
+/** Quote: expected Project Token output for withdrawing `coins`.
+ *  A flat 5% withdrawal fee is applied by the conversion module. */
 export function quoteWithdraw(coins) {
   const c = cfg();
-  const priced = withdrawalTokensFor(coins, { feePct: c.feePct });
+  const priced = withdrawalTokensFor(coins);
   return {
     id: 'q_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     kind: 'withdraw',

@@ -1,13 +1,13 @@
 // Versioned Game Coin conversion rule (fixed rate).
 //
-// Fixed exchange rate: 100 project tokens == 1 Game Coin, both directions.
-//   deposit:    tokens = coins * 100      (100 tokens buy 1 coin)
-//   withdrawal: tokens = coins * 100      (1 coin returns 100 tokens)
-//   credit:     coins  = floor(tokens / 100)  (leftover tokens < 100 carry no coin)
+// Fixed exchange rate: 100 project tokens == 1 Game Coin.
+//   deposit:    tokens = coins * 100                 (no fee — 100 tokens buy 1 coin)
+//   withdrawal: tokens = floor(coins * 100 * 0.95)   (5% withdrawal fee)
+//   credit:     coins  = floor(tokens / 100)         (leftover tokens < 100 carry no coin)
 //
-// There is no bonding curve, no price impact and no fee. The rate is constant,
-// so quotes never drift and there is nothing to deviate from. Every quote still
-// records CONVERSION_RULE_VERSION so a future rate change is auditable per
+// There is no bonding curve and no price impact, so quotes never drift and there
+// is nothing to deviate from. A flat 5% fee applies to withdrawals only. Every
+// quote records CONVERSION_RULE_VERSION so a future rate change is auditable per
 // deposit and per withdrawal.
 
 export const CONVERSION_RULE_VERSION = 'tcity-fixed-100to1-v1';
@@ -15,9 +15,12 @@ export const CONVERSION_RULE_VERSION = 'tcity-fixed-100to1-v1';
 // Project tokens per one Game Coin. Whole-token unit (not raw on-chain units).
 export const TOKENS_PER_COIN = 100;
 
+// Flat fee charged on the reverse conversion (coins -> tokens) only.
+export const WITHDRAWAL_FEE_PCT = 5;
+
 export const CONVERSION_DEFAULTS = Object.freeze({
   tokensPerCoin: TOKENS_PER_COIN,
-  feePct: 0,
+  feePct: WITHDRAWAL_FEE_PCT,
 });
 
 /** Fixed reference price kept for compatibility with older callers/UI. */
@@ -35,7 +38,7 @@ export function impactPctFor() {
   return 0;
 }
 
-/** Project tokens required to fund `coins` Game Coins. */
+/** Project tokens required to fund `coins` Game Coins. Deposits have no fee. */
 export function fundingTokensFor(coins, { tokensPerCoin = TOKENS_PER_COIN } = {}) {
   const amount = Math.trunc(Number(coins));
   const tokens = amount * tokensPerCoin;
@@ -49,14 +52,15 @@ export function fundingTokensFor(coins, { tokensPerCoin = TOKENS_PER_COIN } = {}
   };
 }
 
-/** Project tokens produced by withdrawing `coins` Game Coins. */
-export function withdrawalTokensFor(coins, { tokensPerCoin = TOKENS_PER_COIN } = {}) {
+/** Project tokens produced by withdrawing `coins` Game Coins, less a 5% fee. */
+export function withdrawalTokensFor(coins, { tokensPerCoin = TOKENS_PER_COIN, feePct = WITHDRAWAL_FEE_PCT } = {}) {
   const amount = Math.trunc(Number(coins));
-  const tokens = amount * tokensPerCoin;
+  const gross = amount * tokensPerCoin;
+  const tokens = Math.floor(gross * (1 - feePct / 100));
   return {
     price: 1 / tokensPerCoin,
     spotAtQuote: 1 / tokensPerCoin,
-    feePct: 0,
+    feePct,
     tokens,
     conversionRuleVersion: CONVERSION_RULE_VERSION,
   };

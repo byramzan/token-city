@@ -62,8 +62,8 @@ export const DEFAULT_TOKEN_CONFIG = () => ({
   symbol: TOKEN.name,
   decimals: 18,
   reserveAsset: 'Project token',
-  feePct: 0,                // fixed 100 tokens = 1 coin, no conversion fee
-  marketplaceFeePct: 5,
+  feePct: 5,                // 5% fee on withdrawal (reverse conversion); deposits are free
+  marketplaceFeePct: 5,     // 5% fee on player-business purchases
   maxSlippagePct: 0,        // fixed rate never slips
   maxDeviationPct: 100,     // fixed rate never deviates
   minLiquidity: 0,
