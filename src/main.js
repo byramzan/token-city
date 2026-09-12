@@ -1774,10 +1774,14 @@ function newDraft() {
 
 $('btn-build').addEventListener('click', () => {
   sfx.click();
+  // TEST MODE: allow building without a connected wallet by creating a guest
+  // account on the fly (granted the 1M test balance) instead of forcing a
+  // wallet connection first.
   if (!state.account) {
-    toast('Connect a wallet first — the account owns the house');
-    openWalletModal('connect');
-    return;
+    createAccount();
+    grantTestBalance();
+    save();
+    refreshHud();
   }
   const mine = state.houses.filter((h) => h.owner === state.account.id);
   if (mine.length >= 1) {
