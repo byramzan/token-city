@@ -61,15 +61,15 @@ export const DEFAULT_TOKEN_CONFIG = () => ({
   chain: null,              // cached sanitized /api/token-config payload
   symbol: TOKEN.name,
   decimals: 18,
-  reserveAsset: 'USD-stable (demo)',
-  feePct: 1.25,             // Pump.fun bonding-curve fee at spec time — editable, never hardcoded in UI
+  reserveAsset: 'Project token',
+  feePct: 0,                // fixed 100 tokens = 1 coin, no conversion fee
   marketplaceFeePct: 5,
-  maxSlippagePct: 1.0,
-  maxDeviationPct: 6,
-  minLiquidity: 10000,
-  dailyFundLimit: 50000,
-  dailyWithdrawLimit: 20000,
-  minWithdraw: 50,
+  maxSlippagePct: 0,        // fixed rate never slips
+  maxDeviationPct: 100,     // fixed rate never deviates
+  minLiquidity: 0,
+  dailyFundLimit: 1000000,
+  dailyWithdrawLimit: 1000000,
+  minWithdraw: 1,
   quoteTtlMs: 45000,
   settleHoldMs: 45000,
   flags: { funding: true, marketplace: true, withdrawal: true },
