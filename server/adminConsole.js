@@ -97,23 +97,14 @@ export function consolePage(environment) {
 </section>
 
 <section class="card">
-  <h2>1 · Validate an ERC-20 contract</h2>
+  <h2>1 · Add a token</h2>
+  <p>Enter only the token contract address. The software reads its name, symbol,
+     decimals and total supply from the chain automatically, and uses the
+     deployment's configured deposit vault. Then activate it in step 2.</p>
   <form id="validate-form" class="grid">
     <label class="wide">Token contract address (0x…)
       <input id="contractAddress" required placeholder="0x…" autocomplete="off" spellcheck="false" /></label>
-    <label>Expected token name<input id="expectedName" placeholder="Token City" autocomplete="off" /></label>
-    <label>Expected token symbol<input id="expectedSymbol" placeholder="TCITY" autocomplete="off" /></label>
-    <label>Expected decimals<input id="expectedDecimals" type="number" min="0" max="36" placeholder="18" /></label>
-    <label>Deployment transaction hash (optional)
-      <input id="deploymentTransactionHash" placeholder="0x…" autocomplete="off" spellcheck="false" /></label>
-    <label class="wide">Deposit contract address (vault entry point)
-      <input id="depositContractAddress" required placeholder="0x…" autocomplete="off" spellcheck="false" /></label>
-    <label class="wide">Deposit vault address (leave empty to reuse the deposit contract)
-      <input id="vaultAddress" placeholder="0x…" autocomplete="off" spellcheck="false" /></label>
-    <label>Monitoring start block<input id="monitoringStartBlock" type="number" min="0" placeholder="block number" /></label>
-    <label>Conversion configuration reference<input id="conversionRuleVersion" placeholder="default" /></label>
-    <label class="wide">Activation note<textarea id="activationNote" rows="2" placeholder="Why this token version is being configured"></textarea></label>
-    <div class="actions wide"><button type="submit">Validate on chain</button></div>
+    <div class="actions wide"><button type="submit">Read token &amp; validate</button></div>
   </form>
   <div id="validate-status" class="status"></div>
   <div id="validate-result" class="hidden"></div>
@@ -199,15 +190,6 @@ $('validate-form').addEventListener('submit', async (event) => {
   $('validate-result').classList.add('hidden');
   const input = {
     contractAddress: $('contractAddress').value,
-    expectedName: $('expectedName').value,
-    expectedSymbol: $('expectedSymbol').value,
-    expectedDecimals: $('expectedDecimals').value,
-    deploymentTransactionHash: $('deploymentTransactionHash').value,
-    depositContractAddress: $('depositContractAddress').value,
-    vaultAddress: $('vaultAddress').value,
-    monitoringStartBlock: $('monitoringStartBlock').value,
-    conversionRuleVersion: $('conversionRuleVersion').value,
-    activationNote: $('activationNote').value,
   };
   try {
     const result = await call('validate', { input });

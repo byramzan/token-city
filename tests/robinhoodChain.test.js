@@ -150,6 +150,10 @@ test('token configuration input derives the chain id and rejects unusable addres
     environment: 'testnet', contractAddress: ZERO_ADDRESS, depositContractAddress: VAULT,
   }), /zero address/);
   assert.throws(() => normalizeTokenConfigInput({ environment: 'ethereum' }), /Unknown Robinhood Chain environment/);
+  // With only a token address and no configured vault, the error is explicit.
+  assert.throws(() => normalizeTokenConfigInput({
+    environment: 'testnet', contractAddress: TOKEN,
+  }), /No deposit vault is configured/);
 });
 
 test('metadata mismatches are surfaced as warnings before activation', () => {

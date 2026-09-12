@@ -51,7 +51,14 @@ export function normalizeTokenConfigInput(input = {}) {
     throw new Error('Monitoring start block must be a whole non-negative number');
   }
   const contractAddress = normalizeEvmAddress(input.contractAddress, { label: 'Token contract address' });
-  const depositContractAddress = normalizeEvmAddress(input.depositContractAddress, { label: 'Deposit contract address' });
+  // Deposit/vault addresses are a one-time deployment setting. The admin only
+  // types the token address; the deposit contract and vault fall back to the
+  // server-configured vault so the operations form stays a single field.
+  const depositSource = input.depositContractAddress || input.vaultAddress;
+  if (!depositSource) {
+    throw new Error('No deposit vault is configured for this deployment. Set RHC_VAULT_ADDRESS (and RHC_DEPOSIT_CONTRACT_ADDRESS if it differs) in the backend environment.');
+  }
+  const depositContractAddress = normalizeEvmAddress(depositSource, { label: 'Deposit contract address' });
   const vaultAddress = input.vaultAddress
     ? normalizeEvmAddress(input.vaultAddress, { label: 'Deposit vault address' })
     : depositContractAddress;

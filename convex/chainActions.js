@@ -72,7 +72,18 @@ export const validateTokenContract = action({
       });
     };
     let normalized;
-    try { normalized = normalizeTokenConfigInput(args.input); }
+    try {
+      // The admin form submits only the token address. The deposit/vault
+      // contract is a one-time deployment setting, so fill it from the backend
+      // environment when the form leaves those fields empty.
+      const input = {
+        ...args.input,
+        depositContractAddress: args.input.depositContractAddress
+          || process.env.RHC_DEPOSIT_CONTRACT_ADDRESS || process.env.RHC_VAULT_ADDRESS || '',
+        vaultAddress: args.input.vaultAddress || process.env.RHC_VAULT_ADDRESS || '',
+      };
+      normalized = normalizeTokenConfigInput(input);
+    }
     catch (error) { await audit('rejected', error.message); throw error; }
 
     const allowed = deploymentNetwork();
