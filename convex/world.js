@@ -21,6 +21,9 @@ import {
 import { sameInteriorLayout } from '../server/interiorSnapshot.js';
 
 const MAX_WORLD_HOUSES = 128;
+// One real hour per added floor. Stored server-side (completesAt) and finished
+// by the scheduler, so the timer keeps running even when the player is offline.
+const FLOOR_BUILD_MS = 60 * 60 * 1000;
 
 function fail(code, document = null) {
   throw new ConvexError(document ? { code, document } : { code });
@@ -171,7 +174,15 @@ export const create = mutation({
     }
     if (!validAccessKey(args.accessKey)) fail('household-access-denied');
     const ownersHomes = (await ctx.db.query('houses').take(MAX_WORLD_HOUSES + 1)).filter((row) => row.document.house.owner === candidate.house.owner);
-    if (ownersHomes.length) fail('one-family-house-per-account');
+    // A player may build a SECOND house, but only after their first house has
+    // reached the full five completed floors. No third house.
+    if (ownersHomes.length >= 2) fail('two-family-houses-per-account');
+    if (ownersHomes.length === 1) {
+      const first = ownersHomes[0].document.house;
+      const completedFloors = first.completedFloorCount ?? floorCountFor(first);
+      const building = first.construction?.status === 'building';
+      if (completedFloors < 5 || building) fail('finish-five-floors-before-second-house');
+    }
     const existingCount = await ctx.db.query('houses').take(MAX_WORLD_HOUSES + 1);
     if (existingCount.length >= MAX_WORLD_HOUSES) fail('world-full');
     if (await rowByHouseId(ctx, candidate.house.id)) fail('house-id-taken');
@@ -593,8 +604,11 @@ export const addFloor = mutation({
     if (previousCount !== Math.trunc(args.baseFloorCount)) fail('floor-count-changed');
     if (previousCount >= 5) fail('maximum-five-floors');
     const now = Date.now();
+    // Each added floor takes one real hour. The deadline lives on the server
+    // (completesAt) and the scheduler finishes it, so the timer keeps running
+    // even while the player is offline or has the site closed.
     const construction = { status: 'building', kind: 'extension', eventId: args.eventId, startedAt: now,
-      completesAt: now + 6_000, targetFloorCount: previousCount + 1 };
+      completesAt: now + FLOOR_BUILD_MS, targetFloorCount: previousCount + 1 };
     const house = { ...current.document.house, floorCount: previousCount + 1, completedFloorCount: previousCount,
       residentCount: familyResidents(previousCount), construction, revision: (current.document.house.revision || 0) + 1 };
     const definition = buildHouseDefinition(house);

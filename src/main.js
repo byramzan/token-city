@@ -41,7 +41,7 @@ import { icon } from './icons.js';
 import { createHouse, playBuildAnimation, mat, sharedMaterialCount } from './house.js';
 import { City, updateSmoke } from './city.js';
 import { Residents, needsOf, houseInCrisis } from './residents.js';
-import { createFamilyClient, familyAccessFor, newDemoFamilyAccess, walletFamilyAccess } from './familyClient.js';
+import { createFamilyClient, familyAccessFor, walletFamilyAccess } from './familyClient.js';
 import { createFamilyPanel, effectsMarkup, formatNeedTime, escapeHtml } from './familyPanel.js';
 import { FAMILY_NEEDS, NEED_KEYS, needState } from '../server/familyRules.js';
 import { Interior } from './interior.js';
@@ -522,19 +522,14 @@ function reviewAction({ title, body, label = 'Confirm', onConfirm }) {
 }
 
 async function ensureFamilyAccess(interactive = true) {
-  // TEST MODE: allow opening the family panel without a connected wallet.
-  // A guest account is created on the fly and unlocked with a demo access key,
-  // so the family loop can be exercised before wallet connection is wired up.
-  if (!state.account) {
-    createAccount();
-    save();
-    refreshHud();
+  // The wallet is the login: family access requires a connected, verified wallet.
+  if (!state.account || state.linkedWallets.length === 0) {
+    throw new Error('Connect your wallet to play — your wallet is your account.');
   }
   const stored = familyAccessFor(state.account.id);
   if (stored) return stored;
   const wallet = activeWallet('loginWallet') || activeWallet('paymentWallet');
-  // No wallet linked yet (guest/test session): use a demo access key.
-  if (!wallet || wallet.provider === 'demo') return newDemoFamilyAccess(state.account.id);
+  if (!wallet) throw new Error('Connect your wallet to play — your wallet is your account.');
   if (!interactive) return '';
   // A deterministic signature derives a private capability that reconstructs
   // with the same wallet. It is never included in a public house document.
@@ -810,6 +805,19 @@ wakeUi();
 // ── Wallet connection modal (task4 §16) ──────────────────────────────────────
 let walletModalMode = 'connect'; // 'connect' first wallet | 'add' link another
 let walletConnectPending = false;
+
+/**
+ * The wallet is the login. Any gameplay action (building, interiors, business,
+ * family) requires a connected, verified wallet. Returns true when the player
+ * may proceed; otherwise it opens the connect modal and returns false.
+ */
+function requireWallet() {
+  const hasWallet = Boolean(state.account && state.linkedWallets.length > 0);
+  if (hasWallet) return true;
+  toast('Connect your wallet to play — your wallet is your account.', 'err', 5000);
+  openWalletModal('connect');
+  return false;
+}
 
 function openWalletModal(modeArg = 'connect') {
   walletModalMode = modeArg;
@@ -1536,6 +1544,7 @@ async function commitBusinessState(houseId, nextBusiness, {
 }
 
 function openBizBuy(houseId) {
+  if (!requireWallet()) return;
   const cfg = state.houses.find((h) => h.id === houseId);
   if (!cfg) return;
   const list = $('bizbuy-list');
@@ -1756,18 +1765,25 @@ function newDraft() {
 
 $('btn-build').addEventListener('click', () => {
   sfx.click();
-  // TEST MODE: allow building without a connected wallet by creating a guest
-  // account on the fly instead of forcing a wallet connection first.
-  if (!state.account) {
-    createAccount();
-    save();
-    refreshHud();
-  }
+  // The wallet is the login: no wallet, no building.
+  if (!requireWallet()) return;
   const mine = state.houses.filter((h) => h.owner === state.account.id);
-  if (mine.length >= 1) {
-    toast('One game account owns one main house — this is your home already');
+  // A player may own a second house, but only after the first reaches its
+  // full five completed floors (matches the server rule).
+  if (mine.length >= 2) {
+    toast('You already own two houses — the maximum per account', 'err');
     $('btn-find').click();
     return;
+  }
+  if (mine.length === 1) {
+    const first = mine[0];
+    const floors = first.completedFloorCount ?? floorCountFor(first);
+    const building = first.construction?.status === 'building';
+    if (floors < 5 || building) {
+      toast('Finish all 5 floors of your first house before building a second one', 'err', 5500);
+      $('btn-find').click();
+      return;
+    }
   }
   draft = draft || state.builderDraft || newDraft();
   draft.layout ||= 'balanced';
@@ -2220,6 +2236,7 @@ function refreshHomeVitals() {
 }
 
 $('hc-add-floor').onclick = async () => {
+  if (!requireWallet()) return;
   const house = state.houses.find((entry) => entry.id === selectedHouseId);
   if (!house || house.owner !== state.account?.id) return;
   const floors = floorCountFor(house), cost = floorExtensionCost(house);
@@ -2231,7 +2248,7 @@ $('hc-add-floor').onclick = async () => {
   let spend = null;
   reviewAction({
     title: `Add floor ${floors + 1}`,
-    body: `<p>${fmt(cost)} Game Coins · 6 seconds · <b>+2 residents after completion</b></p><p>The new floor includes a two-person sleeping area, storage, seating and lighting. Existing furniture keeps its exact position. The roof moves to the new top floor.</p><p>Family after completion: ${residentsFor(floors + 1)} · consumption units ${familyConsumptionFor(floors + 1)}</p>`,
+    body: `<p>${fmt(cost)} Game Coins · <b>takes 1 hour to build</b> · <b>+2 residents after completion</b></p><p>The timer runs on the server, so it keeps counting even if you close the game. The new floor includes a two-person sleeping area, storage, seating and lighting. Existing furniture keeps its exact position. The roof moves to the new top floor.</p><p>Family after completion: ${residentsFor(floors + 1)} · consumption units ${familyConsumptionFor(floors + 1)}</p>`,
     label: 'Build next floor',
     onConfirm: async () => {
       await ensureFamilySession(true);
@@ -3248,6 +3265,10 @@ $('btn-sound').addEventListener('click', () => {
   applyMute();
   refreshHud();
   sfx.click();
+});
+$('btn-whitepaper').addEventListener('click', () => {
+  sfx.click();
+  showPanel('modal-whitepaper');
 });
 addEventListener('pointerdown', () => startAmbient(), { once: true });
 

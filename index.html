@@ -37,6 +37,7 @@
         </div>
         <div class="hud-right">
           <button id="btn-network" class="network-pill hidden" tabindex="-1" aria-hidden="true">Devnet</button>
+          <button id="btn-whitepaper" class="btn btn-ghost" title="Read the Token City whitepaper" type="button">Whitepaper</button>
           <button id="btn-sound" class="icon-btn" title="Sound"></button>
           <div id="balances" class="balances hidden">
             <span class="chip" id="chip-token" title="Project Token in the active payment wallet"></span>
@@ -117,6 +118,107 @@
         <div class="wallet-list" id="wallet-list"></div>
         <p class="muted wallet-footer" id="wallet-security-note">Connect the wallet that holds the configured token. Token City will never ask for your recovery phrase or private key.</p>
         <p class="muted wallet-footer">Install links are shown separately and connecting never redirects away from the game.</p>
+      </div>
+    </div>
+
+    <!-- Whitepaper -->
+    <div id="modal-whitepaper" class="modal hidden">
+      <div class="modal-box wide wp-box">
+        <button class="panel-close" data-close="modal-whitepaper" data-ic="close"></button>
+        <div class="wp-scroll">
+          <div class="wp-hero">
+            <div class="wp-kicker"><span data-ic="home"></span> Token City</div>
+            <h1 class="wp-title">Whitepaper</h1>
+            <p class="wp-lede">A living low-poly town, built together by a community of holders. Your wallet is your key, your house is your mark on the map, and the whole city grows as more people join.</p>
+          </div>
+
+          <section class="wp-section">
+            <h2>What is Token City?</h2>
+            <p>Token City is a shared 3D town that lives in your browser. Everyone builds on the same map, so the streets, neighborhoods, and skyline you see are made by real players. Anyone can walk the city and look around for free — but to build and take part, you connect your wallet.</p>
+            <p>The city is not a way to earn money. It is a place to show that you are part of the community, to build something that is yours, and to watch a world grow around you.</p>
+          </section>
+
+          <section class="wp-section">
+            <h2>Your wallet is your login</h2>
+            <p>There are no passwords and no separate sign-ups. You connect your wallet, sign a free message to prove it is yours, and that becomes your account. Everything you build is tied to your wallet, so it is always waiting for you when you come back.</p>
+            <ul class="wp-list">
+              <li>Connect a supported wallet to play.</li>
+              <li>Signing in is free and never asks for your secret phrase or private key.</li>
+              <li>No wallet, no building — but sightseeing is open to everyone.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Game Coins</h2>
+            <p>Inside the city you spend <b>Game Coins</b>. You get them by depositing the project token, and you can turn Game Coins back into tokens whenever you like. Coins you earn from other players are yours to keep, spend, or withdraw.</p>
+            <ul class="wp-list">
+              <li><b>Deposit</b> tokens to receive Game Coins at a fixed, transparent rate — no deposit fee.</li>
+              <li><b>Withdraw</b> Game Coins back to tokens at any time — no withdrawal fee.</li>
+              <li>Coins move between players when you buy and sell; the game never prints extra coins out of thin air.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Build your house</h2>
+            <p>Your house is your personal landmark in the city. You choose its style, materials, and layout in the builder, then it takes its place on the shared map for everyone to see. You own one main house — make it count.</p>
+            <ul class="wp-list">
+              <li>Design the look, then place it in the living town.</li>
+              <li>Every house sits on its own plot with a yard and a path to the street.</li>
+              <li>The city automatically draws roads and links similar houses into neighborhoods.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Grow floor by floor</h2>
+            <p>Make your house bigger by adding floors. Each new floor adds living space and room for more family members — but building takes real time.</p>
+            <ul class="wp-list">
+              <li>Each added floor takes <b>1 hour</b> to build.</li>
+              <li>The timer runs on the city's servers, so it keeps counting even after you close the game — come back and your floor is ready.</li>
+              <li>A house can grow up to <b>5 floors</b>.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Build a second house</h2>
+            <p>Dedicated builders can claim a second home. It unlocks once your first house is fully grown, rewarding you for seeing a project through.</p>
+            <ul class="wp-list">
+              <li>Finish all <b>5 floors</b> of your first house first.</li>
+              <li>Then you may build one more — two houses per player, maximum.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Open a business</h2>
+            <p>Next to your home you can open a small business — a bakery, café, workshop and more, based on your house's style. Stock it with goods and other players' residents will come and shop.</p>
+            <ul class="wp-list">
+              <li>New shops appear instantly for every player, live — no page refresh needed.</li>
+              <li>Set your prices and keep your shelves stocked to keep customers coming.</li>
+              <li>A small marketplace fee applies to each sale between players.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Family &amp; daily life</h2>
+            <p>Your house is home to a little family that lives on even while you are away. Keep them supplied and happy — food, rest, and comfort all matter. A well-kept home shows in the city.</p>
+            <ul class="wp-list">
+              <li>Residents have needs that change over time.</li>
+              <li>Fund your household budget and buy supplies to keep everyone thriving.</li>
+              <li>More floors mean a bigger family and more life around your home.</li>
+            </ul>
+          </section>
+
+          <section class="wp-section">
+            <h2>Decorate &amp; collect</h2>
+            <p>Step inside and make each floor yours with furniture and playful crypto-culture items. Fill your yard, collect rare pieces, and give your home a personality that stands out on the street.</p>
+          </section>
+
+          <section class="wp-section">
+            <h2>One living city</h2>
+            <p>Everything happens on one shared map in real time. New houses, new shops, and new floors appear for everyone as they happen. Explore your neighbors, follow the roads, and watch a small town slowly become a city — built by the whole community, together.</p>
+          </section>
+
+          <p class="wp-foot">Token City is for building, collecting, and belonging — not for financial return. Have fun and make your mark.</p>
+        </div>
       </div>
     </div>
 
