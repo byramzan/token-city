@@ -485,11 +485,11 @@ body {
 .wallet-row.unavailable:active { transform: none; box-shadow: 0 3px 0 var(--shadow); }
 .wallet-row.selected { border-color: #7b61ff; background: rgba(123,97,255,.12); box-shadow: 0 0 0 2px rgba(123,97,255,.16), 0 3px 0 var(--shadow); }
 .wallet-logo {
-  width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center;
-  justify-content: center; font-size: 1.25rem; border: 2.5px solid rgba(73, 54, 35, .7); flex-shrink: 0;
+  width: 44px; height: 44px; padding: 2px; border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 1.25rem; border: 1px solid rgba(73, 54, 35, .16); flex-shrink: 0;
   background: #fff; overflow: hidden;
 }
-.wallet-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.wallet-logo img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 9px; }
 .wallet-logo-fallback svg { width: 21px; height: 21px; }
 .wallet-logo-demo { background: #d9fff8; }
 .wallet-logo-test { background: #ede9ff; color: #5c47d8; font-weight: 900; }

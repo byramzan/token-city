@@ -1,3 +1,4 @@
+import { walletBrandIcon } from './walletIcons.js';
 // Token City — entry point: renderer, modes (city / builder / interior / graph), UI.
 // task4: account + multi-wallet, ledger economy, businesses, resident needs,
 // fog & WASD. task5: parametric multi-floor interior editor.
@@ -52,7 +53,6 @@ import {
 
 const $ = (id) => document.getElementById(id);
 
-/** Brand icon for a linked wallet row, including retired Solana providers. */
 /**
  * Deposit and withdrawal status with a Blockscout link (task8 §13.4).
  * The player can always see whether the token has actually been submitted.
@@ -70,15 +70,6 @@ function renderChainHistory() {
       + ` · ${fmt(row.gameCoinAmount)} ${gem} → ${esc(shortAddr(row.walletAddress))} · ${link}`
       + `${row.failureCode ? ` · <span style="color:var(--red)">${esc(row.failureCode)}</span>` : ''}</div>`;
   }).join('');
-}
-
-function walletBrandIcon(providerId) {
-  const known = {
-    robinhood: 'ethereum', metamask: 'metamask', coinbase: 'coinbase', okx: 'okx',
-    phantom: 'phantom', backpack: 'backpack', walletconnect: 'walletconnect',
-    solflare: 'solflare',
-  }[providerId];
-  return known ? `https://api.iconify.design/token-branded:${known}-background.svg` : '';
 }
 
 // ── Renderer ─────────────────────────────────────────────────────────────────
@@ -844,7 +835,7 @@ addEventListener('eip6963:announceProvider', () => {
 
 function walletLogo(url, name, extraClass = '') {
   return url
-    ? `<span class="wallet-logo ${extraClass}"><img src="${url}" alt="${name} logo" loading="lazy" referrerpolicy="no-referrer" /></span>`
+    ? `<span class="wallet-logo ${extraClass}"><img src="${esc(url)}" alt="${esc(name)} logo" width="40" height="40" decoding="async" referrerpolicy="no-referrer" /></span>`
     : `<span class="wallet-logo wallet-logo-fallback ${extraClass}">${icon('wallet')}</span>`;
 }
 
@@ -3355,14 +3346,15 @@ function startBlackoutWatch() {
   };
   const check = async () => {
     try {
-      const res = await fetch('/api/site-blackout', { cache: 'no-store' });
+      const res = await fetch(`/api/site-blackout?t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json().catch(() => ({}));
         if (data && data.blackout === true) applyBlack();
       }
     } catch { /* fail open */ }
   };
-  setInterval(check, 15000);
+  void check();
+  setInterval(check, 10000);
 }
 
 async function boot() {

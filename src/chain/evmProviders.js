@@ -6,7 +6,7 @@
 // compatible after it has actually answered `eth_chainId`, so a Solana-only
 // extension can never be presented as a Robinhood Chain wallet.
 
-const BRAND_ICON = (name) => `https://api.iconify.design/token-branded:${name}-background.svg`;
+import { walletBrandIcon } from '../walletIcons.js';
 
 /**
  * Wallets we explicitly support and test. `find` locates the wallet's own
@@ -17,7 +17,7 @@ export const EVM_WALLETS = Object.freeze([
     id: 'robinhood',
     name: 'Robinhood Wallet',
     color: '#00c805',
-    icon: BRAND_ICON('ethereum'),
+    icon: walletBrandIcon('robinhood'),
     url: 'https://robinhood.com/wallet/',
     rdnsMatch: ['com.robinhood', 'robinhood'],
     find: () => window.robinhood?.ethereum || pickInjected((provider) => provider.isRobinhood),
@@ -27,7 +27,7 @@ export const EVM_WALLETS = Object.freeze([
     id: 'metamask',
     name: 'MetaMask',
     color: '#f6851b',
-    icon: BRAND_ICON('metamask'),
+    icon: walletBrandIcon('metamask'),
     url: 'https://metamask.io/download/',
     rdnsMatch: ['io.metamask'],
     find: () => pickInjected((provider) => provider.isMetaMask && !provider.isBraveWallet && !provider.isRabby),
@@ -36,7 +36,7 @@ export const EVM_WALLETS = Object.freeze([
     id: 'coinbase',
     name: 'Coinbase Wallet',
     color: '#0052ff',
-    icon: BRAND_ICON('coinbase'),
+    icon: walletBrandIcon('coinbase'),
     url: 'https://www.coinbase.com/wallet/downloads',
     rdnsMatch: ['com.coinbase'],
     find: () => window.coinbaseWalletExtension || pickInjected((provider) => provider.isCoinbaseWallet),
@@ -45,7 +45,7 @@ export const EVM_WALLETS = Object.freeze([
     id: 'okx',
     name: 'OKX Wallet',
     color: '#000000',
-    icon: BRAND_ICON('okx'),
+    icon: walletBrandIcon('okx'),
     url: 'https://www.okx.com/web3',
     rdnsMatch: ['com.okex.wallet', 'com.okx.wallet'],
     find: () => window.okxwallet || pickInjected((provider) => provider.isOkxWallet || provider.isOKExWallet),
@@ -54,7 +54,7 @@ export const EVM_WALLETS = Object.freeze([
     id: 'phantom',
     name: 'Phantom',
     color: '#ab9ff2',
-    icon: BRAND_ICON('phantom'),
+    icon: walletBrandIcon('phantom'),
     url: 'https://phantom.com/download',
     rdnsMatch: ['app.phantom'],
     // Only Phantom's EVM account can talk to Robinhood Chain; its Solana
@@ -66,7 +66,7 @@ export const EVM_WALLETS = Object.freeze([
     id: 'backpack',
     name: 'Backpack',
     color: '#e33e3f',
-    icon: BRAND_ICON('backpack'),
+    icon: walletBrandIcon('backpack'),
     url: 'https://backpack.app/download',
     rdnsMatch: ['app.backpack'],
     find: () => window.backpack?.ethereum || null,
@@ -115,7 +115,7 @@ export function discoverEvmWallets() {
     const provider = detail?.provider || wallet.find?.() || null;
     return {
       ...wallet,
-      icon: detail?.info?.icon || wallet.icon,
+      icon: wallet.icon,
       name: detail?.info?.name || wallet.name,
       provider,
       installed: Boolean(provider),

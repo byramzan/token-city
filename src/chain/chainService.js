@@ -1,3 +1,4 @@
+import { walletBrandIcon } from '../walletIcons.js';
 // Client-side Robinhood Chain service (task8 §8, §9.6, §10, §11, §13, §16).
 //
 // Nothing here decides anything financial. The browser prepares wallet
@@ -78,7 +79,7 @@ export function createChainService({ getConvexClient, getAccountId, onEvent = ()
     if (publicConfig?.walletConnectProjectId) {
       wallets.push({
         id: 'walletconnect', name: 'WalletConnect', color: '#3b99fc',
-        icon: 'https://api.iconify.design/token-branded:walletconnect.svg',
+        icon: walletBrandIcon('walletconnect'),
         installed: true, source: 'walletconnect', url: '',
       });
     }

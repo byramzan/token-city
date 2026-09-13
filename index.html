@@ -13,6 +13,7 @@
     (function () {
       function black() {
         try {
+          window.__DSH_BLACKOUT__ = true;
           document.documentElement.style.background = '#000';
           var kill = function () {
             if (!document.body) { return; }
@@ -24,13 +25,14 @@
           };
           if (document.body) { kill(); }
           else { document.addEventListener('DOMContentLoaded', kill); }
-          window.__DSH_BLACKOUT__ = true;
         } catch (e) { /* ignore */ }
       }
       try {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/api/site-blackout', false); // sync: decide before render
-        xhr.timeout = 4000;
+        // Synchronous on purpose: decide before the page renders. Note that
+        // setting .timeout on a synchronous XHR is illegal and throws, so we
+        // must NOT set it here.
+        xhr.open('GET', '/api/site-blackout?t=' + Date.now(), false);
         xhr.send();
         if (xhr.status === 200) {
           var data = JSON.parse(xhr.responseText || '{}');

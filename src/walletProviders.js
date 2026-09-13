@@ -1,3 +1,4 @@
+import { walletBrandIcon, isLocalWalletIcon } from './walletIcons.js';
 import { getWallets } from '@wallet-standard/app';
 import { StandardWalletAdapter } from '@solana/wallet-standard-wallet-adapter-base';
 
@@ -16,54 +17,53 @@ let walletOperationInFlight = false;
 const walletTabId = globalThis.crypto?.randomUUID?.()
   || `tab_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
-const BRAND_ICON = (name) => `https://api.iconify.design/token-branded:${name}-background.svg`;
 
 export const WALLET_PROVIDERS = [
   {
     id: 'phantom', name: 'Phantom', aliases: ['phantom'], color: '#ab9ff2',
-    icon: BRAND_ICON('phantom'), tags: ['browser', 'mobile', 'solana'],
+    icon: walletBrandIcon('phantom'), tags: ['browser', 'mobile', 'solana'],
     url: 'https://phantom.com/download',
     detect: () => !!(window.phantom?.solana?.isPhantom || window.solana?.isPhantom),
     adapter: () => window.phantom?.solana || (window.solana?.isPhantom ? window.solana : null),
   },
   {
     id: 'solflare', name: 'Solflare', aliases: ['solflare'], color: '#fc7227',
-    icon: BRAND_ICON('solflare'), tags: ['browser', 'mobile', 'solana'],
+    icon: walletBrandIcon('solflare'), tags: ['browser', 'mobile', 'solana'],
     url: 'https://solflare.com/download',
     detect: () => !!window.solflare?.isSolflare,
     adapter: () => window.solflare || null,
   },
   {
     id: 'backpack', name: 'Backpack', aliases: ['backpack'], color: '#e33e3f',
-    icon: BRAND_ICON('backpack'), tags: ['browser', 'mobile', 'solana'],
+    icon: walletBrandIcon('backpack'), tags: ['browser', 'mobile', 'solana'],
     url: 'https://backpack.app/download',
     detect: () => !!(window.backpack?.isBackpack || window.xnft?.solana),
     adapter: () => window.backpack || window.xnft?.solana || null,
   },
   {
     id: 'jupiter', name: 'Jupiter Mobile', aliases: ['jupiter', 'jup mobile'], color: '#00bef0',
-    icon: 'https://jup.ag/favicon.ico', tags: ['mobile', 'solana'],
+    icon: walletBrandIcon('jupiter'), tags: ['mobile', 'solana'],
     url: 'https://jup.ag/mobile',
     detect: () => !!window.jupiter?.solana,
     adapter: () => window.jupiter?.solana || null,
   },
   {
     id: 'coinbase', name: 'Coinbase Wallet', aliases: ['coinbase'], color: '#0052ff',
-    icon: BRAND_ICON('coinbase'), tags: ['browser', 'mobile', 'solana'],
+    icon: walletBrandIcon('coinbase'), tags: ['browser', 'mobile', 'solana'],
     url: 'https://www.coinbase.com/wallet/downloads',
     detect: () => !!(window.coinbaseSolana || window.coinbaseWalletExtension?.solana),
     adapter: () => window.coinbaseSolana || window.coinbaseWalletExtension?.solana || null,
   },
   {
     id: 'okx', name: 'OKX Wallet', aliases: ['okx'], color: '#121212',
-    icon: BRAND_ICON('okx'), tags: ['browser', 'mobile', 'solana'],
+    icon: walletBrandIcon('okx'), tags: ['browser', 'mobile', 'solana'],
     url: 'https://web3.okx.com/download',
     detect: () => !!window.okxwallet?.solana,
     adapter: () => window.okxwallet?.solana || null,
   },
   {
     id: 'metamask', name: 'MetaMask', aliases: ['metamask'], color: '#f6851b',
-    icon: BRAND_ICON('metamask'), tags: ['browser', 'mobile', 'solana snap'],
+    icon: walletBrandIcon('metamask'), tags: ['browser', 'mobile', 'solana snap'],
     url: 'https://metamask.io/download/',
     // A plain EVM MetaMask provider is deliberately not treated as Solana-ready.
     // A Solana-capable MetaMask/Snap registers through Wallet Standard.
@@ -91,6 +91,7 @@ export function walletMatchesProvider(wallet, provider) {
 
 export function safeWalletIcon(value, fallback = '') {
   const icon = String(value || '');
+  if (isLocalWalletIcon(icon)) return icon;
   if (/^data:image\/(?:svg\+xml|png|webp|gif);base64,[a-z0-9+/=]+$/i.test(icon)) return icon;
   if (/^https:\/\/[a-z0-9.-]+(?::\d+)?(?:\/[^\s"'<>]*)?$/i.test(icon)) return icon;
   return fallback;
@@ -229,7 +230,7 @@ export function providerCatalog() {
       // Known injected providers use their own connection window. Wallet Standard
       // stays as the discovery/fallback path for providers without an injection.
       source: legacyInstalled ? 'legacy' : standardWallet ? 'wallet-standard' : 'catalog',
-      icon: safeWalletIcon(standardWallet?.icon, provider.icon),
+      icon: provider.icon,
       adapter: legacyInstalled
         ? provider.adapter
         : standardWallet ? () => adapterForStandardWallet(standardWallet) : provider.adapter,
