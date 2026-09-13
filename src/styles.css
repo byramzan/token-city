@@ -68,8 +68,7 @@ body {
 }
 .loader-logo-img {
   display: block; margin: 0 auto; max-width: min(72vw, 460px); width: 100%;
-  height: auto; border-radius: 22px;
-  box-shadow: 0 12px 34px rgba(20, 60, 90, 0.35), 0 3px 0 rgba(43, 126, 161, 0.5);
+  height: auto;
   animation: logo-float 3.4s ease-in-out infinite;
 }
 @keyframes logo-float { 50% { transform: translateY(-8px); } }
