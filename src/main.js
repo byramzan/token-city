@@ -1,5 +1,5 @@
 import { walletBrandIcon } from './walletIcons.js';
-// Token City — entry point: renderer, modes (city / builder / interior / graph), UI.
+// My Hood — entry point: renderer, modes (city / builder / interior / graph), UI.
 // task4: account + multi-wallet, ledger economy, businesses, resident needs,
 // fog & WASD. task5: parametric multi-floor interior editor.
 
@@ -525,7 +525,7 @@ async function ensureFamilyAccess(interactive = true) {
   // A deterministic signature derives a private capability that reconstructs
   // with the same wallet. It is never included in a public house document.
   const signature = await chain.signMessage(JSON.stringify({
-    application: 'Token City', purpose: 'Private family access v1',
+    application: 'My Hood', purpose: 'Private family access v1',
     walletAddress: wallet.address, accountId: state.account.id,
   }));
   return walletFamilyAccess(state.account.id, signature);
@@ -884,7 +884,7 @@ function renderWalletList() {
     list.appendChild(row);
   }
   $('wallet-security-note')?.replaceChildren(document.createTextNode(
-    `Connect the wallet that holds the configured token. Token City will never ask for your recovery phrase or private key.`,
+    `Connect the wallet that holds the configured token. My Hood will never ask for your recovery phrase or private key.`,
   ));
 }
 
@@ -1237,7 +1237,7 @@ $('fund-go').addEventListener('click', async () => {
     await cancelActivePaymentSession(error?.message || 'wallet-connect-failed');
     const kind = walletErrorKind(error);
     const message = kind === 'wallet-busy'
-      ? 'Another Token City tab is using the wallet. Finish that request and try again.'
+      ? 'Another My Hood tab is using the wallet. Finish that request and try again.'
       : kind === 'extension-stale'
         ? 'The wallet extension was restarted. Reload this tab and try again.'
         : error?.message || 'Could not start a new payment session';

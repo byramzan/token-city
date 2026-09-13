@@ -42,6 +42,45 @@ async function authorize(ctx, { accountId, sessionToken }) {
   return row;
 }
 
+// ── world reset (admin) ─────────────────────────────────────────────────────
+/** Delete every document in a table, in batches, and return the count. */
+async function clearTable(ctx, table) {
+  let removed = 0;
+  // Convex reads are bounded, so drain the table in bounded passes.
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const rows = await ctx.db.query(table).take(500);
+    if (rows.length === 0) break;
+    for (const row of rows) await ctx.db.delete(row._id);
+    removed += rows.length;
+    if (rows.length < 500) break;
+  }
+  return removed;
+}
+
+/**
+ * Wipe all shared world progress for everyone (houses, families, businesses,
+ * trades, and all coin/deposit/withdrawal state) so the city starts from zero.
+ * Auth and configuration are preserved: token config, audit trail, wallet links
+ * and site flags are left intact. Admin only.
+ */
+export const resetWorld = mutation({
+  args: { serviceSecret: v.string(), confirm: v.string() },
+  handler: async (ctx, args) => {
+    assertService(args.serviceSecret);
+    if (args.confirm !== 'RESET WORLD') chainFail('reset-world-confirmation-required');
+    const tables = [
+      'households', 'familyAnalytics', 'householdOperations',
+      'houses', 'trades', 'businessOperations', 'paymentSessions',
+      'chainDeposits', 'chainWithdrawals', 'processedChainLogs',
+      'chainOutbox', 'chainCursors',
+    ];
+    const cleared = {};
+    for (const table of tables) cleared[table] = await clearTable(ctx, table);
+    return { cleared, at: Date.now() };
+  },
+});
+
 // ── site-wide operational flags (admin kill switch) ─────────────────────────
 async function siteFlagRow(ctx, flagId) {
   return ctx.db.query('siteFlags').withIndex('by_flag_id', (q) => q.eq('flagId', flagId)).first();

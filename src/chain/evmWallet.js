@@ -208,8 +208,8 @@ export async function connectEvmWallet({ walletId, network, walletConnectProject
       projectId: walletConnectProjectId,
       chain: network,
       metadata: metadata || {
-        name: 'Token City',
-        description: 'Token City on Robinhood Chain',
+        name: 'My Hood',
+        description: 'My Hood on Robinhood Chain',
         url: location.origin,
         icons: [`${location.origin}/favicon.ico`],
       },

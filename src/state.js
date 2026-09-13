@@ -5,8 +5,7 @@
 
 import { TOKEN, levelFor } from './config.js';
 
-const KEY = 'tokencity_v4';
-const OLD_KEY = 'tokencity_v3';
+const KEY = 'myhood_v1';
 
 export const state = {
   // identity
@@ -142,40 +141,11 @@ export function load() {
       labelLegacyChainWallets();
       return true;
     }
-    // v3 → v4 migration: keep houses, turn the single wallet into an account
-    const old = localStorage.getItem(OLD_KEY);
-    if (old) return migrateV3(JSON.parse(old));
+    // Fresh start under the myhood_v1 key: legacy tokencity_* saves are not
+    // migrated, so a returning player begins from zero after the world reset.
     state.tokenConfig = DEFAULT_TOKEN_CONFIG();
     return false;
   } catch { state.tokenConfig = DEFAULT_TOKEN_CONFIG(); return false; }
-}
-
-function migrateV3(data) {
-  state.tokenConfig = DEFAULT_TOKEN_CONFIG();
-  state.houses = data.houses || [];
-  state.interiors = data.interiors || {};
-  state.links = data.links || {};
-  state.visits = data.visits || {};
-  state.muted = !!data.muted;
-  state.interiorsBackup = JSON.parse(JSON.stringify(data.interiors || {}));
-  if (data.wallet?.address) {
-    const acc = createAccount();
-    const w = linkWallet(data.wallet.address, data.wallet.provider || 'demo', { skipSave: true });
-    if (w) {
-      acc.loginWallet = w.id; acc.paymentWallet = w.id; acc.withdrawalWallet = w.id;
-    }
-    const oldData = data.wallets?.[data.wallet.address];
-    if (oldData) {
-      state.walletMeta[data.wallet.address] = { tokenBalance: oldData.tokenBalance ?? TOKEN.startDemoBalance };
-      acc.converted = oldData.converted || 0;
-      acc.migratedCoins = oldData.coins || 0; // issued into the ledger by main.js after ledger init
-    }
-    // houses owned by the old wallet address now belong to the account
-    for (const h of state.houses) if (h.owner === data.wallet.address) h.owner = acc.id;
-  }
-  upgradeLegacyDemoWallets();
-  save();
-  return true;
 }
 
 /**

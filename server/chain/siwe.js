@@ -9,8 +9,8 @@ import { normalizeEvmAddress, sameAddress } from './evm.js';
 export const CHALLENGE_TTL_MS = 5 * 60_000;
 
 export const WALLET_STATEMENT =
-  'Link this wallet to your Token City account. This signature proves ownership. '
-  + 'It authorizes no transfer and Token City will never ask for your recovery phrase or private key.';
+  'Link this wallet to your My Hood account. This signature proves ownership. '
+  + 'It authorizes no transfer and My Hood will never ask for your recovery phrase or private key.';
 
 /** Build the exact EIP-4361 message text that must be signed. */
 export function buildChallengeMessage(challenge) {

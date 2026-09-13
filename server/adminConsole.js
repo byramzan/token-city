@@ -56,9 +56,9 @@ function layout(title, body, script = '') {
 
 /** Unauthenticated shell. Nothing here describes the protected surface. */
 export function loginPage() {
-  return layout('Token City · Operations', `
+  return layout('My Hood · Operations', `
 <section class="card">
-  <div class="eyebrow">Token City</div>
+  <div class="eyebrow">My Hood</div>
   <h1>Operations sign-in</h1>
   <p>This area is restricted. Sign in to continue.</p>
   <form id="login-form">
@@ -85,9 +85,9 @@ form.addEventListener('submit', async (event) => {
 /** Authenticated console. `environment` is resolved by the deployment (§17). */
 export function consolePage(environment) {
   const env = JSON.stringify(environment);
-  return layout('Token City · Token operations', `
+  return layout('My Hood · Token operations', `
 <section class="card">
-  <div class="eyebrow">Token City</div>
+  <div class="eyebrow">My Hood</div>
   <h1>Robinhood Chain token operations</h1>
   <p>Deployment environment <b id="env-name"></b> · chain id <b id="env-chain"></b> · explorer
      <a id="env-explorer" target="_blank" rel="noreferrer noopener">Blockscout</a></p>

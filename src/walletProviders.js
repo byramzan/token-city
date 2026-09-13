@@ -171,7 +171,7 @@ async function withStorageWalletLock(operation) {
   }
 }
 
-/** Ensures only one Token City tab can ask an extension for approval at a time. */
+/** Ensures only one My Hood tab can ask an extension for approval at a time. */
 export async function withWalletOperationLock(operation) {
   if (typeof operation !== 'function') throw new TypeError('wallet-operation-required');
   if (walletOperationInFlight) throw new Error('wallet-busy');

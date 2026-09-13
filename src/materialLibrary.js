@@ -1,4 +1,4 @@
-// Central visual-material library for Token City.
+// Central visual-material library for My Hood.
 //
 // All runtime surface maps are deterministic, original CanvasTextures. Keeping
 // them procedural makes the Vite build self-contained while still giving every
