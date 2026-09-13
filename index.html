@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>My Hood — a cozy low-poly crypto town</title>
   <meta name="description" content="My Hood is a shared 3D town that lives in your browser. Build your house, open a business, and make your mark in one living city." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>" />
+  <link rel="icon" type="image/png" href="/cover.png" />
   <link rel="apple-touch-icon" href="/cover.png" />
   <!-- Social share cover (Open Graph + Twitter card) -->
   <meta property="og:type" content="website" />
@@ -67,7 +67,7 @@
       <div class="loader-cloud lc1"></div>
       <div class="loader-cloud lc2"></div>
       <div class="loader-inner">
-        <div class="loader-logo">Token <span class="accent">City</span></div>
+        <img class="loader-logo-img" src="/loader.png" alt="My Hood" />
         <div class="loader-blocks"><span></span><span></span><span></span><span></span></div>
         <div class="loader-bar"><div id="loader-fill"></div></div>
         <div class="loader-hint">Paving streets, planting gardens…</div>
@@ -115,8 +115,8 @@
         <div id="home-vitals-status" class="home-vitals-status"></div>
         <button id="btn-family" class="btn btn-ghost family-open" type="button">Family & supplies</button>
       </div>
-      <button id="contract-address-copy" class="contract-address" type="button" title="Copy contract address">
-        <span>C/A</span><b id="contract-address-value">######</b>
+      <button id="contract-address-copy" class="contract-address" type="button" title="Contract address">
+        <span>CA</span><b id="contract-address-value">Coming soon</b>
       </button>
     </div>
 
@@ -178,96 +178,96 @@
         <div class="wp-scroll">
           <div class="wp-hero">
             <div class="wp-kicker"><span data-ic="home"></span> My Hood</div>
-            <h1 class="wp-title">Whitepaper</h1>
-            <p class="wp-lede">A living low-poly town, built together by a community of holders. Your wallet is your key, your house is your mark on the map, and the whole city grows as more people join.</p>
+            <h1 class="wp-title">Family Life and the Player-Owned Economy</h1>
+            <p class="wp-lede">The game is a shared town built by its players. Each player owns one family home and may choose to purchase a business. Families need food, rest, learning, and time together. Businesses provide the goods and experiences that help them thrive.</p>
           </div>
 
           <section class="wp-section">
-            <h2>What is My Hood?</h2>
-            <p>My Hood is a shared 3D town that lives in your browser. Everyone builds on the same map, so the streets, neighborhoods, and skyline you see are made by real players. Anyone can walk the city and look around for free — but to build and take part, you connect your wallet.</p>
-            <p>The city is not a way to earn money. It is a place to show that you are part of the community, to build something that is yours, and to watch a world grow around you.</p>
+            <p>This creates a simple economic loop: families visit businesses owned by other players, business owners earn Game Coins from real customers, and those coins continue circulating through the town.</p>
           </section>
 
           <section class="wp-section">
-            <h2>Your wallet is your login</h2>
-            <p>There are no passwords and no separate sign-ups. You connect your wallet, sign a free message to prove it is yours, and that becomes your account. Everything you build is tied to your wallet, so it is always waiting for you when you come back.</p>
+            <h2>Your Home and Family</h2>
+            <p>Every home belongs to one family. A one-floor house begins with four residents. Players can choose up to five floors when building their home or add floors later. Each additional floor adds two family members:</p>
+            <table class="wp-table">
+              <thead><tr><th>Floors</th><th>Family members</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>4</td></tr>
+                <tr><td>2</td><td>6</td></tr>
+                <tr><td>3</td><td>8</td></tr>
+                <tr><td>4</td><td>10</td></tr>
+                <tr><td>5</td><td>12</td></tr>
+              </tbody>
+            </table>
+            <p>More floors give the family more space and create greater demand for food, books, gifts, and services. They do not create free income. A five-floor home is still one family, not five separate households.</p>
+            <p>Larger families need larger purchases to receive the full benefit. For example, a meal for four will only partly satisfy a family of eight. Businesses can offer family-size packages so players do not have to make many small purchases.</p>
+          </section>
+
+          <section class="wp-section">
+            <h2>The Four Family Needs</h2>
+            <p>Every family has four shared needs, each shown on a scale from 0 to 100:</p>
             <ul class="wp-list">
-              <li>Connect a supported wallet to play.</li>
-              <li>Signing in is free and never asks for your secret phrase or private key.</li>
-              <li>No wallet, no building — but sightseeing is open to everyone.</li>
+              <li><b>Hunger:</b> How well-fed the family is.</li>
+              <li><b>Energy:</b> How rested and active the family feels.</li>
+              <li><b>Knowledge:</b> How engaged the family is in reading and learning.</li>
+              <li><b>Family Bond:</b> How connected family members feel to one another.</li>
             </ul>
+            <p>Needs decrease gradually during active play. Hunger is the fastest: without food, it takes approximately eight active hours to reach zero from a full bar. Energy takes approximately ten hours, Knowledge fourteen, and Family Bond eighteen. These are starting balance targets and may be adjusted as the game develops.</p>
+            <p>Needs decrease more slowly when the browser is in the background or the player is offline. A player should not return after a long absence to find that the entire family has suddenly entered a crisis.</p>
+            <p>The game warns players before a need reaches zero and recommends nearby businesses that can help.</p>
           </section>
 
           <section class="wp-section">
-            <h2>Game Coins</h2>
-            <p>Inside the city you spend <b>Game Coins</b>. You get them by depositing the project token, and you can turn Game Coins back into tokens whenever you like. Coins you earn from other players are yours to keep, spend, or withdraw.</p>
+            <h2>Visiting Businesses</h2>
+            <p>This is a browser game, so players do not need to steer each resident through a shop. They click a business, review its offers, and choose what the family needs. Before confirming, they can see the price, how many family members the offer covers, and the expected effect.</p>
+            <p>The initial business types are:</p>
+            <table class="wp-table">
+              <thead><tr><th>Business</th><th>What it offers</th><th>Main benefit</th></tr></thead>
+              <tbody>
+                <tr><td>Grocery Store</td><td>Food baskets and family supplies</td><td>Hunger</td></tr>
+                <tr><td>Bakery</td><td>Bread, breakfasts, and prepared food</td><td>Hunger</td></tr>
+                <tr><td>Restaurant</td><td>Family meals</td><td>Hunger, with a Family Bond bonus</td></tr>
+                <tr><td>Café</td><td>Drinks and shared café visits</td><td>Energy, with a small Family Bond bonus</td></tr>
+                <tr><td>Rest Center</td><td>Rest and recovery services</td><td>Energy</td></tr>
+                <tr><td>Library or Bookstore</td><td>Books and reading sessions</td><td>Knowledge</td></tr>
+                <tr><td>Flower Shop</td><td>Bouquets that family members can give one another</td><td>Family Bond</td></tr>
+                <tr><td>Family Entertainment</td><td>Shared activities and outings</td><td>Family Bond</td></tr>
+              </tbody>
+            </table>
+            <p>Some offers have an additional benefit. A restaurant dinner, for example, can satisfy Hunger while bringing the family closer. A bouquet improves Family Bond when it is given, not merely when it is bought.</p>
+            <p>Businesses have limited goods or service capacity. Owners choose what to offer and at what price within the game's rules, then replenish their stock or capacity to keep serving customers. A sale is revenue, not necessarily profit: owners also need to consider the cost of providing what they sell.</p>
+          </section>
+
+          <section class="wp-section">
+            <h2>What Happens When a Need Reaches Zero</h2>
+            <p>A zero need puts the family into <b>Crisis Focus</b>. The family must address its most urgent problem before it can benefit from unrelated purchases.</p>
+            <p>For example, if Hunger reaches zero, the family cannot use a book or library visit to restore Knowledge. It must first buy and use food to bring Hunger back to at least 20. Meanwhile, Knowledge and the other needs continue to decrease. Once Hunger reaches 20, normal choices become available again—unless another need has also reached zero.</p>
+            <p>The same principle applies to every need:</p>
             <ul class="wp-list">
-              <li><b>Deposit</b> tokens to receive Game Coins at a fixed, transparent rate — no deposit fee.</li>
-              <li><b>Withdraw</b> Game Coins back to tokens at any time — no withdrawal fee.</li>
-              <li>Coins move between players when you buy and sell; the game never prints extra coins out of thin air.</li>
+              <li>At <b>zero Hunger</b>, food is the priority.</li>
+              <li>At <b>zero Energy</b>, rest or an energy-restoring service is the priority.</li>
+              <li>At <b>zero Knowledge</b>, books or learning are the priority.</li>
+              <li>At <b>zero Family Bond</b>, a gift or shared family activity is the priority.</li>
             </ul>
+            <p>If several needs reach zero, the family addresses them in this order: Hunger, Energy, Knowledge, then Family Bond. If all four reach zero, the game presents those four recovery steps clearly.</p>
+            <p>A crisis is a temporary restriction, not a punishment that destroys progress. Residents do not disappear. Players do not lose their house, business, furniture, or Game Coins because a need reaches zero.</p>
+            <p>Player-owned businesses are always presented first. If no suitable player business can provide an essential crisis item or service, a limited city emergency offer prevents the family from becoming permanently stuck. It provides only enough recovery to leave the crisis, costs more than a normal player offer, and does not compete with player businesses during ordinary play.</p>
           </section>
 
           <section class="wp-section">
-            <h2>Build your house</h2>
-            <p>Your house is your personal landmark in the city. You choose its style, materials, and layout in the builder, then it takes its place on the shared map for everyone to see. You own one main house — make it count.</p>
-            <ul class="wp-list">
-              <li>Design the look, then place it in the living town.</li>
-              <li>Every house sits on its own plot with a yard and a path to the street.</li>
-              <li>The city automatically draws roads and links similar houses into neighborhoods.</li>
-            </ul>
+            <h2>How Business Owners Earn</h2>
+            <p>A player buys a business separately from their home. When another player purchases its goods or services, the business owner receives the sale proceeds in Game Coins, less the disclosed marketplace fee.</p>
+            <p>The planned marketplace fee is <b>5% of a completed sale</b>. For a purchase priced at 100 Game Coins, the seller receives 95 Game Coins and the platform receives 5. The buyer sees the full price before confirming, and the seller sees what they will receive.</p>
+            <p>Owners can earn by offering useful products at competitive prices, keeping their business supplied, and serving the needs of nearby families. A well-run grocery store may attract families seeking dependable food; a café may appeal to players who want both Energy and a social benefit.</p>
+            <p>A business does not generate Game Coins simply because it exists. Earnings depend on purchases by other players. No level of income, profit, or token value is guaranteed.</p>
           </section>
 
           <section class="wp-section">
-            <h2>Grow floor by floor</h2>
-            <p>Make your house bigger by adding floors. Each new floor adds living space and room for more family members — but building takes real time.</p>
-            <ul class="wp-list">
-              <li>Each added floor takes <b>1 hour</b> to build.</li>
-              <li>The timer runs on the city's servers, so it keeps counting even after you close the game — come back and your floor is ready.</li>
-              <li>A house can grow up to <b>5 floors</b>.</li>
-            </ul>
+            <h2>Game Coins and the Project Token</h2>
+            <p>Players acquire the project token in their own wallets and can convert eligible tokens into Game Coins under the conversion terms shown in the game. Game Coins are used to build and expand homes, purchase businesses, and buy goods and services from other players.</p>
+            <p>Business sales move existing Game Coins from customers to sellers; satisfying a family need does not create new coins. Eligible Game Coins may be converted back into the project token under the withdrawal terms displayed at the time. Conversion amounts can vary with the applicable terms and token market conditions.</p>
+            <p>The purpose of this economy is to make player activity meaningful. Homes create families, families create demand, and businesses compete to meet it. Adding floors expands a family and its needs, while building a successful business means providing something other players genuinely want to buy.</p>
           </section>
-
-          <section class="wp-section">
-            <h2>Build a second house</h2>
-            <p>Dedicated builders can claim a second home. It unlocks once your first house is fully grown, rewarding you for seeing a project through.</p>
-            <ul class="wp-list">
-              <li>Finish all <b>5 floors</b> of your first house first.</li>
-              <li>Then you may build one more — two houses per player, maximum.</li>
-            </ul>
-          </section>
-
-          <section class="wp-section">
-            <h2>Open a business</h2>
-            <p>Next to your home you can open a small business — a bakery, café, workshop and more, based on your house's style. Stock it with goods and other players' residents will come and shop.</p>
-            <ul class="wp-list">
-              <li>New shops appear instantly for every player, live — no page refresh needed.</li>
-              <li>Set your prices and keep your shelves stocked to keep customers coming.</li>
-              <li>A small marketplace fee applies to each sale between players.</li>
-            </ul>
-          </section>
-
-          <section class="wp-section">
-            <h2>Family &amp; daily life</h2>
-            <p>Your house is home to a little family that lives on even while you are away. Keep them supplied and happy — food, rest, and comfort all matter. A well-kept home shows in the city.</p>
-            <ul class="wp-list">
-              <li>Residents have needs that change over time.</li>
-              <li>Fund your household budget and buy supplies to keep everyone thriving.</li>
-              <li>More floors mean a bigger family and more life around your home.</li>
-            </ul>
-          </section>
-
-          <section class="wp-section">
-            <h2>Decorate &amp; collect</h2>
-            <p>Step inside and make each floor yours with furniture and playful crypto-culture items. Fill your yard, collect rare pieces, and give your home a personality that stands out on the street.</p>
-          </section>
-
-          <section class="wp-section">
-            <h2>One living city</h2>
-            <p>Everything happens on one shared map in real time. New houses, new shops, and new floors appear for everyone as they happen. Explore your neighbors, follow the roads, and watch a small town slowly become a city — built by the whole community, together.</p>
-          </section>
-
-          <p class="wp-foot">My Hood is for building, collecting, and belonging — not for financial return. Have fun and make your mark.</p>
         </div>
       </div>
     </div>

@@ -654,12 +654,9 @@ function renderPublicContractAddress() {
   const value = $('contract-address-value');
   const button = $('contract-address-copy');
   if (!value || !button) return;
-  value.textContent = publicContractAddress
-    ? `${publicContractAddress.slice(0, 6)}…${publicContractAddress.slice(-4)}`
-    : '######';
-  button.title = publicContractAddress
-    ? `Copy ${chain.network().networkName} contract address: ${publicContractAddress}`
-    : 'Contract address has not been published yet';
+  // The contract address is intentionally hidden until the real token launches.
+  value.textContent = 'Coming soon';
+  button.title = 'Contract address — coming soon';
 }
 
 /**
@@ -679,16 +676,8 @@ async function refreshPublicContractAddress() {
 
 $('contract-address-copy')?.addEventListener('click', async () => {
   sfx.click();
-  if (!publicContractAddress) {
-    toast('C/A has not been published yet', 'err');
-    return;
-  }
-  try {
-    await navigator.clipboard.writeText(publicContractAddress);
-    toast('Contract address copied', 'ok');
-  } catch {
-    toast('Could not copy C/A — copy it from the button tooltip', 'err');
-  }
+  // Address stays hidden until the real token launches.
+  toast('Contract address — coming soon', 'ok');
 });
 setInterval(() => { if (document.visibilityState === 'visible') void refreshPublicContractAddress(); }, 30_000);
 addEventListener('focus', () => { void refreshPublicContractAddress(); });
