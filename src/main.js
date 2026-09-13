@@ -16,7 +16,7 @@ import { Bubbles } from './dialogues.js';
 import { createWorldMultiplayer } from './multiplayer.js';
 import {
   state, save, load, createAccount, linkWallet, unlinkWallet, walletById,
-  activeWallet, tokenMeta, userLevel, shortAddr, makeDemoAddress, recordVisit,
+  activeWallet, tokenMeta, userLevel, shortAddr, recordVisit,
   nameTaken, addHouse, interiorOf, placementsOf, householdOf, addInventory,
   takeInventory, auditLog, MAX_LINKED_WALLETS, savePlacementsRevision,
   archiveCurrentAccount, restoreAccountForWallet,
@@ -882,23 +882,6 @@ function renderWalletList() {
         else toast(`${wallet.name} does not provide an install page`, 'err');
       });
     }
-    list.appendChild(row);
-  }
-  if (!query || 'demo wallet'.includes(query)) {
-    const archivedDemo = Object.values(state.accountArchive || {})
-      .flatMap((entry) => entry.linkedWallets || [])
-      .find((wallet) => wallet.provider === 'demo');
-    const row = document.createElement('button');
-    row.className = 'wallet-row';
-    row.disabled = walletConnectPending;
-    row.innerHTML = `
-      <span class="wallet-logo wallet-logo-demo">🧪</span>
-      <span class="w-meta"><b>${archivedDemo ? 'Continue with Demo Wallet' : 'Demo Wallet'}</b><small>offline test mode · no chain transaction · ${fmt(archivedDemo ? tokenMeta(archivedDemo.address).tokenBalance : TOKEN.startDemoBalance)} ${TOKEN.name}</small></span>
-      <span class="w-arrow">›</span>`;
-    row.addEventListener('click', () => {
-      sfx.click();
-      finishConnect(archivedDemo?.address || makeDemoAddress(), 'demo', { chainFamily: 'demo' });
-    });
     list.appendChild(row);
   }
   $('wallet-security-note')?.replaceChildren(document.createTextNode(
