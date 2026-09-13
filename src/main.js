@@ -1928,7 +1928,7 @@ function renderBuilderStep() {
     DETAILS.forEach((o) => {
       let lockReason = null;
       if (!detailAllowed(o.id, draft)) {
-        lockReason = o.id === 'solar' ? 'Needs a flat or shed roof' : 'Needs more than one floor';
+        lockReason = o.id === 'solar' ? 'Needs a flat roof' : 'Needs more than one floor';
       }
       optCard(o, draft.detail === o.id, () => { draft.detail = o.id; }, { lockReason });
     });
@@ -3270,13 +3270,13 @@ addEventListener('pointerdown', () => startAmbient(), { once: true });
 function seedCity() {
   const demos = [
     { name: 'Plaza Corner', nickname: 'satoshi', foundation: 'compact', height: 'attic', material: 'wood', roof: 'gable', kit: 'cozy', detail: 'none', scheme: 'warm', companion: 'cafe' },
-    { name: 'Cedar Rows', nickname: 'gardener', foundation: 'wide', height: 'one', material: 'wood', roof: 'shed', kit: 'open', detail: 'solar', scheme: 'light', companion: 'flower' },
+    { name: 'Cedar Rows', nickname: 'gardener', foundation: 'wide', height: 'one', material: 'wood', roof: 'flat', kit: 'open', detail: 'solar', scheme: 'light', companion: 'flower' },
     { name: 'Ember Hall', nickname: 'baker_b', foundation: 'compact', height: 'two', material: 'brick', roof: 'gable', kit: 'cozy', detail: 'balcony', scheme: 'warm', companion: 'bakery' },
     { name: 'Forge Yard', nickname: 'tinker', foundation: 'wide', height: 'one', material: 'brick', roof: 'flat', kit: 'open', detail: 'antenna', scheme: 'dark', companion: 'workshop' },
     { name: 'Alabaster', nickname: 'curator', foundation: 'wide', height: 'two', material: 'stone', roof: 'flat', kit: 'open', detail: 'solar', scheme: 'light', companion: 'library' },
     { name: 'Dove House', nickname: 'dreamer', foundation: 'lshape', height: 'attic', material: 'stone', roof: 'gable', kit: 'cozy', detail: 'none', scheme: 'warm', companion: 'gallery' },
     { name: 'Neo Court', nickname: 'neo', foundation: 'compact', height: 'two', material: 'tech', roof: 'flat', kit: 'tech', detail: 'token', scheme: 'cold', companion: 'arcade' },
-    { name: 'Signal Box', nickname: 'uplink', foundation: 'wide', height: 'one', material: 'tech', roof: 'shed', kit: 'tech', detail: 'antenna', scheme: 'dark', companion: 'techstore' },
+    { name: 'Signal Box', nickname: 'uplink', foundation: 'wide', height: 'one', material: 'tech', roof: 'flat', kit: 'tech', detail: 'antenna', scheme: 'dark', companion: 'techstore' },
   ];
   demos.forEach((d, i) => {
     const cfg = { id: 'demo_' + i, owner: 'demo' + (i % 4), ...d, builtAt: Date.now() - (demos.length - i) * 86400000 };

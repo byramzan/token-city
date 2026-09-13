@@ -52,21 +52,6 @@ function box(w, h, d, color, opts) {
   return m;
 }
 
-// A shed roof is a rotated box, so a single textured material also paints its
-// underside. At a grazing camera angle those dense roof lines alias into the
-// "stuck" horizontal bands from the bug report. Keep the tile pattern on the
-// upper face only and give the fascia/soffit calm, untextured materials.
-function shedRoofBox(w, h, d, color, opts) {
-  const fascia = mat(shade(color, -10));
-  const upper = mat(color, opts);
-  const soffit = mat(shade(color, -18));
-  const materials = [fascia, fascia, upper, soffit, fascia, fascia];
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), materials);
-  m.castShadow = true;
-  m.receiveShadow = true;
-  return m;
-}
-
 // Explicit triangular prism: stable normals and no oversized/rotated cylinder
 // faces that could clip across the camera on some WebGL drivers.
 function prism(width, height, depth, color, opts = {}) {
@@ -391,7 +376,9 @@ export function createHouse(cfg) {
   // ── 4. Roof ──
   const roofH = hasAttic ? 2.15 : 1.5;
   const roofStart = parts.length;
-  if (cfg.roof === 'gable' || (hasAttic && cfg.roof === 'flat')) {
+  // Only gable and flat remain. Any legacy 'shed' (or unknown) roof renders as
+  // the closed gable prism so old saves never show a removed roof type.
+  if (cfg.roof !== 'flat' || (hasAttic && cfg.roof === 'flat')) {
     const r = add(prism(W + 1.0, roofH, D + 1.0, sc.roof, roofTexture));
     r.position.y = topY;
     for (const sz of [-1, 1]) {
@@ -436,25 +423,6 @@ export function createHouse(cfg) {
       add(smoke);
       anim.push(smoke);
     }
-  } else if (cfg.roof === 'shed') {
-    const slope = hasAttic ? 0.34 : 0.22;
-    const roofDepth = D + 1.3;
-    const roofThickness = 0.28;
-    const halfRise = Math.sin(slope) * roofDepth / 2;
-    const r = add(shedRoofBox(W + 1.0, roofThickness, roofDepth, sc.roof, roofTexture));
-    // A visible clearance keeps the wall and roof out of the same depth range;
-    // the dark fascia closes the seam so there is no floating-roof gap.
-    r.position.y = topY + 0.24 + halfRise + roofThickness / 2;
-    r.rotation.x = slope;
-    const backHeight = Math.max(hasAttic ? 1.4 : 0.8, halfRise * 2 + 0.12);
-    const backWall = add(box(W, backHeight, 0.25, sc.wall, wallTexture));
-    backWall.position.set(0, topY + backHeight / 2, -D / 2 + 0.15);
-    if (hasAttic) {
-      const aw = mkWindow();
-      aw.position.set(0.9, topY + 0.75, -D / 2 + 0.33);
-      aw.rotation.y = Math.PI;
-      add(aw);
-    }
   } else { // flat
     const r = add(box(W + 0.5, 0.3, D + 0.5, sc.roof, roofTexture));
     r.position.y = topY + 0.15;
@@ -480,7 +448,7 @@ export function createHouse(cfg) {
 
   // ── 5. Signature detail ──
   const detailTop = cfg.roof === 'flat' ? topY + 0.3 : topY + roofH;
-  if (cfg.detail === 'solar' && cfg.roof !== 'gable') {
+  if (cfg.detail === 'solar' && cfg.roof === 'flat') {
     for (const px of [-1.3, 1.3]) {
       const panel = add(box(2.0, 0.1, 1.5, '#1c3a5e'));
       panel.position.set(px, (cfg.roof === 'flat' ? topY + 0.62 : topY + 1.25), 0);

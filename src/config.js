@@ -126,7 +126,6 @@ export const MATERIALS = [
 
 export const ROOFS = [
   { id: 'gable', name: 'Gable', desc: 'Classic pitched silhouette', cost: 0,   level: 1 },
-  { id: 'shed',  name: 'Shed',  desc: 'Modern single slope', cost: 100, level: 1 },
   { id: 'flat',  name: 'Flat',  desc: 'Parapet terrace on top', cost: 150, level: 1 },
 ];
 
@@ -137,7 +136,7 @@ export const KITS = [
 ];
 
 export const DETAILS = [
-  { id: 'solar',   name: 'Solar Panels', desc: 'Needs a flat or shed roof', cost: 200, level: 1 },
+  { id: 'solar',   name: 'Solar Panels', desc: 'Needs a flat roof', cost: 200, level: 1 },
   { id: 'antenna', name: 'Antenna',      desc: 'Small mast with a beacon', cost: 150, level: 1 },
   { id: 'balcony', name: 'Balcony',      desc: 'Needs more than one floor', cost: 250, level: 2 },
   { id: 'token',   name: 'Token Sign',   desc: 'Spinning golden coin', cost: 350, level: 3 },
@@ -145,7 +144,7 @@ export const DETAILS = [
 
 /** Combination rules (spec §10): a detail can be unavailable for some homes. */
 export function detailAllowed(detail, cfg) {
-  if (detail === 'solar') return cfg.roof !== 'gable';
+  if (detail === 'solar') return cfg.roof === 'flat';
   if (detail === 'balcony') return floorCountFor(cfg) > 1;
   return true;
 }

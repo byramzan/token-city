@@ -539,10 +539,9 @@ export class Interior {
     const polygon = this.def.footprintPolygon;
     const type = this.def.roofType;
     const rise = this.def.roofHeight || 2;
-    const heightAt = type === 'flat' ? () => 0.18 : type === 'shed'
-      ? (x) => rise * (x / f.w + 0.5)
+    const heightAt = type === 'flat' ? () => 0.18
       : (x) => rise * (1 - Math.abs(x) / (f.w / 2));
-    const faces = type === 'flat' || type === 'shed' ? [polygon]
+    const faces = type === 'flat' ? [polygon]
       : [-1, 1].map((side) => clippedAtRidge(polygon, side));
     for (const face of faces) {
       if (face.length < 3) continue;
@@ -556,7 +555,7 @@ export class Interior {
     for (let i = 0; i < polygon.length; i++) {
       const a = polygon[i], b = polygon[(i + 1) % polygon.length];
       const points = [a];
-      if (a[0] * b[0] < 0 && type !== 'flat' && type !== 'shed') {
+      if (a[0] * b[0] < 0 && type !== 'flat') {
         const t = -a[0] / (b[0] - a[0]);
         points.push([0, a[1] + t * (b[1] - a[1])]);
       }

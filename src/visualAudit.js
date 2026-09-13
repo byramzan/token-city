@@ -91,7 +91,7 @@ export function auditVisualAssets() {
   for (const height of ['one', 'two', 'attic']) {
     models.push(houseRecord(`house.height.${height}`, `House height option: ${height}`, { height }));
   }
-  for (const roof of ['gable', 'shed', 'flat']) {
+  for (const roof of ['gable', 'flat']) {
     models.push(houseRecord(`house.roof.${roof}`, `House roof option: ${roof}`, { roof, detail: roof === 'gable' ? 'antenna' : 'solar' }));
   }
   for (const kit of ['cozy', 'open', 'tech']) {
@@ -105,7 +105,7 @@ export function auditVisualAssets() {
     models.push(houseRecord(`house.detail.${detail}`, `House signature detail: ${detail}`, {
       detail,
       height: detail === 'balcony' ? 'two' : 'one',
-      roof: detail === 'solar' ? 'shed' : 'gable',
+      roof: detail === 'solar' ? 'flat' : 'gable',
     }));
   }
 

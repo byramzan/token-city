@@ -12,7 +12,7 @@ const HOUSE_ENUMS = Object.freeze({
   height: new Set(['one', 'two', 'attic']),
   material: new Set(['wood', 'brick', 'stone', 'tech']),
   layout: new Set(['balanced', 'social', 'private', 'open', 'split', 'family']),
-  roof: new Set(['gable', 'flat', 'shed']),
+  roof: new Set(['gable', 'flat']),
   scheme: new Set(['warm', 'light', 'dark', 'cold']),
 });
 
@@ -115,7 +115,8 @@ export function normalizeWorldDocument(input) {
     floorCount: floorCountFor(sourceHouse),
     material: text(sourceHouse.material, 20, 'wood'),
     layout: text(sourceHouse.layout, 20, 'balanced'),
-    roof: text(sourceHouse.roof, 20, 'gable'),
+    // 'shed' roofs were removed; any legacy value maps to the closed gable.
+    roof: (() => { const r = text(sourceHouse.roof, 20, 'gable'); return r === 'shed' ? 'gable' : r; })(),
     kit: text(sourceHouse.kit, 24, 'cozy'),
     detail: text(sourceHouse.detail, 24, 'none'),
     scheme: text(sourceHouse.scheme, 20, 'warm'),
