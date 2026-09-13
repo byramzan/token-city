@@ -3428,13 +3428,14 @@ async function boot() {
           city.controls.update();
         } else if (houseId && state.houses.some((h) => h.id === houseId)) {
           const cfg = state.houses.find((h) => h.id === houseId);
-          city.flyTo(new THREE.Vector3(cfg.plot.x, 0, cfg.plot.z), { distance: 20, height: 12, duration: 1800 });
-          setTimeout(() => selectHouse(houseId), 1300);
+          city.placeAt(new THREE.Vector3(cfg.plot.x, 0, cfg.plot.z), { distance: 20, height: 12 });
+          selectHouse(houseId);
         } else if (houseId) {
           toast('House not found — the link may be outdated', 'err', 5000);
         } else {
-          city.camera.position.set(70, 48, 70);
-          city.flyTo(new THREE.Vector3(0, 0, 0), { distance: 52, height: 30, duration: 2600 });
+          // Static opening view: the camera is simply placed, no fly-in and no
+          // spring-back on load.
+          city.placeAt(new THREE.Vector3(0, 0, 0), { distance: 52, height: 30 });
         }
       }, 250);
     }

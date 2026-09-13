@@ -1047,6 +1047,27 @@ export class City {
     this.scene.add(this.fireflies);
   }
 
+  /** Place the camera instantly, with no animation. Used on startup so the
+   *  opening view is simply "there" — no zoom-in, no spring-back. The landing
+   *  spot is clamped into the OrbitControls distance band so the controls do
+   *  not nudge it on the next frame. */
+  placeAt(target, { distance = 52, height = 30 } = {}) {
+    this.cancelFly();
+    const dir = new THREE.Vector3(target.x, 0, target.z).normalize();
+    if (dir.lengthSq() < 0.01) dir.set(0.7, 0, 0.7);
+    const tgt = new THREE.Vector3(target.x, 2.2, target.z);
+    const pos = new THREE.Vector3(
+      target.x - dir.x * distance * 0.8, height, target.z - dir.z * distance * 0.8,
+    );
+    const offset = pos.clone().sub(tgt);
+    const clamped = Math.min(this.controls.maxDistance, Math.max(this.controls.minDistance, offset.length()));
+    pos.copy(tgt).add(offset.setLength(clamped));
+    this.controls.target.copy(tgt);
+    this.camera.position.copy(pos);
+    this.camera.lookAt(tgt);
+    this.controls.update();
+  }
+
   flyTo(target, { distance = 18, height = 11, duration = 1400, onDone } = {}) {
     const startPos = this.camera.position.clone();
     const startTgt = this.controls.target.clone();
