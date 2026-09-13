@@ -101,8 +101,12 @@ body {
 .hud-top > *, .hud-bottom > * { pointer-events: auto; }
 .hud-left { display: flex; align-items: center; gap: 8px; }
 .logo {
-  font-weight: 800; font-size: 1.3rem; color: #fff; display: flex; align-items: center; gap: 6px;
+  font-weight: 800; font-size: 1.3rem; color: #fff; display: flex; align-items: center; gap: 8px;
   text-shadow: 0 2.5px 0 #2b7ea1, 0 5px 12px rgba(20, 60, 90, 0.45);
+}
+.logo-icon {
+  width: 34px; height: 34px; border-radius: 9px; object-fit: cover;
+  box-shadow: 0 2px 8px rgba(20, 60, 90, 0.35);
 }
 .logo .ic { color: var(--gold); filter: drop-shadow(0 2px 0 #b8860b); }
 .stage-badge {

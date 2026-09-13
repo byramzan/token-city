@@ -85,10 +85,10 @@ configureMaterialLibrary(renderer);
 renderer.setPixelRatio(Math.min(devicePixelRatio, VISUAL_QUALITY.pixelRatioCap));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.06;
+renderer.toneMappingExposure = 1.12;
 
 // Read-only runtime counters used by the visual regression checklist and the
 // developer guide. No renderer/scene handles are exposed to production code.
@@ -3501,10 +3501,39 @@ function frame(timestamp) {
       if (!build) continue;
       const now = rec.serverClock ? rec.serverClock.at + performance.now() - rec.serverClock.received : Date.now();
       const progress = build.status === 'completed' ? 1 : Math.min(0.96, Math.max(0, (now - build.startedAt) / (build.completesAt - build.startedAt)));
-      const top = Math.max(...rec.houseParts.map((part) => part.userData.order || 0), 1);
+      // Reveal by real part metadata, not by fragile position/order guesses.
+      // A house is built floor-by-floor; the roof and everything that belongs to
+      // the top floor must appear TOGETHER at the very end so the top floor is
+      // never left with a hole in the roof, a lone tall wall, or open space.
+      const floorH = 2.5;
+      const maxFloorIndex = rec.houseParts.reduce(
+        (m, p) => (typeof p.userData.floorIndex === 'number' ? Math.max(m, p.userData.floorIndex) : m), 0);
+      const targetFloors = build.targetFloorCount || (maxFloorIndex + 1) || 1;
+      const done = build.kind === 'extension' ? (rec.cfg.completedFloorCount || 0) : 0;
+      const completedHeight = 0.5 + done * floorH;
+      // Fraction of the in-progress top floor that is up (0..1). The roof caps
+      // the last slice so it snaps on only once the walls have fully risen.
+      const remaining = Math.max(1, targetFloors - done);
+      const perFloor = 1 / remaining;
       for (const part of rec.houseParts) {
-        const lowerFloor = build.kind === 'extension' && part.position.y < 0.5 + rec.cfg.completedFloorCount * 2.5 && !part.userData.roof;
-        part.visible = lowerFloor || progress >= (part.userData.order || 0) / (top + 1);
+        const fi = part.userData.floorIndex;
+        const isRoof = !!part.userData.roof;
+        // Already-finished lower floors (extensions) are always shown.
+        if (build.kind === 'extension' && !isRoof
+          && ((typeof fi === 'number' && fi < done) || part.position.y < completedHeight - 0.05)) {
+          part.visible = true;
+          continue;
+        }
+        // The roof (and top-floor caps) only appear once construction is basically
+        // finished, so it never floats over an unfinished storey.
+        if (isRoof) { part.visible = progress >= 0.999 || build.status === 'completed'; continue; }
+        // Everything else rises with its own floor's slice of the remaining work.
+        const floorOfPart = typeof fi === 'number'
+          ? fi
+          : Math.max(done, Math.min(targetFloors - 1, Math.floor((part.position.y - 0.5) / floorH)));
+        const sliceIndex = Math.max(0, floorOfPart - done);
+        const threshold = sliceIndex * perFloor;
+        part.visible = progress >= threshold;
       }
     }
     updateWasd(dt);

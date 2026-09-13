@@ -87,12 +87,14 @@ export class City {
     this.scene.add(this.hemi);
     // A soft warm fill preserves the graphic 2.5D shapes in shadow and keeps
     // dark tech palettes readable without flattening the directional light.
-    this.ambient = new THREE.AmbientLight('#ffd9b5', 0.32);
+    this.ambient = new THREE.AmbientLight('#ffd9b5', 0.30);
     this.scene.add(this.ambient);
-    const sun = new THREE.DirectionalLight('#fff4d6', 1.6);
+    const sun = new THREE.DirectionalLight('#fff4d6', 1.72);
     sun.position.set(40, 60, 25);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    // Higher-resolution shadow atlas + soft PCF gives cleaner, softer contact
+    // shadows without the crawling/aliased edges of the smaller map.
+    sun.shadow.mapSize.set(4096, 4096);
     sun.shadow.camera.left = -80;
     sun.shadow.camera.right = 80;
     sun.shadow.camera.top = 80;
@@ -102,10 +104,17 @@ export class City {
     // normalBias keeps low-poly corners from self-shadowing as the sun moves;
     // the smaller depth bias avoids detached "floating" shadows.
     sun.shadow.bias = -0.00012;
-    sun.shadow.normalBias = 0.035;
-    sun.shadow.radius = 1.5;
+    sun.shadow.normalBias = 0.03;
+    sun.shadow.radius = 2.6;
     this.scene.add(sun);
     this.sun = sun;
+    // A cool sky-side fill from the opposite direction adds gentle depth and
+    // keeps shadowed faces from going muddy. It casts no shadow (fill only).
+    const fill = new THREE.DirectionalLight('#bcd6ff', 0.32);
+    fill.position.set(-38, 34, -28);
+    fill.castShadow = false;
+    this.scene.add(fill);
+    this.fillLight = fill;
     // Shadows update at a controlled cadence. This prevents tiny day-cycle
     // changes from re-rasterizing the atlas every animation frame and removes
     // the impression of rapidly crawling shadows without freezing NPC shadows.
@@ -311,8 +320,8 @@ export class City {
       this.scene.add(bench);
     }
 
-    for (let i = 0; i < 4; i++) {
-      const a = (i / 4) * Math.PI * 2 + 0.8;
+    for (let i = 0; i < 2; i++) {
+      const a = (i / 2) * Math.PI * 2 + 0.8;
       this._lampPost(Math.cos(a) * (PLAZA_R - 1.6), Math.sin(a) * (PLAZA_R - 1.6));
     }
 
@@ -385,9 +394,9 @@ export class City {
       ring.position.y = 0.115;
       ring.receiveShadow = true;
       this.scene.add(ring);
-      // street lamps every ~1/10 of the ring
-      for (let i = 0; i < 10; i++) {
-        const a = (i / 10) * Math.PI * 2 + 0.15;
+      // street lamps every ~1/5 of the ring (reduced 50%)
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2 + 0.15;
         this._lampPost(Math.cos(a) * (r - 1.6), Math.sin(a) * (r - 1.6));
       }
     }
