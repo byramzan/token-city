@@ -3147,17 +3147,9 @@ function updateWasd(dt) {
     const step = camVel.clone().multiplyScalar(dt);
     city.camera.position.add(step);
     city.controls.target.add(step);
-    // planar city-boundary limits
-    const t = city.controls.target;
-    const r = Math.hypot(t.x, t.z);
-    const maxR = 140;
-    if (r > maxR) {
-      const k = maxR / r;
-      const dx = t.x - t.x * k, dz = t.z - t.z * k;
-      t.x -= dx; t.z -= dz;
-      city.camera.position.x -= dx; city.camera.position.z -= dz;
-    }
-    if (city.camera.position.y < 4) city.camera.position.y = 4; // ground collision
+    // The playable-area boundary is enforced centrally every frame in
+    // city.update() (_clampToBounds), so keyboard movement needs no separate
+    // clamp here — it can never push the camera past the safe edge.
   }
   // optional Q/E rotation around the target
   const rot = (keys.KeyQ ? 1 : 0) - (keys.KeyE ? 1 : 0);

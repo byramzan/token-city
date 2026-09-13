@@ -56,8 +56,8 @@ export class City {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.06;
     this.controls.minDistance = 10;
-    this.controls.maxDistance = 110;
-    this.controls.maxPolarAngle = 1.42;
+    this.controls.maxDistance = 88;
+    this.controls.maxPolarAngle = 1.32;
     this.controls.target.set(0, 2, 0);
 
     this.houseGroups = new Map(); // houseId -> record
@@ -1117,6 +1117,30 @@ export class City {
     this.flying = false;
   }
 
+  /** Keep the look-at target and the camera inside the playable disc so the
+   *  rim of the ground is never in frame. Runs every frame after
+   *  controls.update(), so it constrains mouse orbit/zoom/pan and keyboard
+   *  movement alike. */
+  _clampToBounds() {
+    const TARGET_MAX_R = 96;   // how far the focus point may travel from center
+    const CAMERA_MAX_R = 150;  // hard cap on the camera itself (ground disc is 160)
+    const t = this.controls.target;
+    const tr = Math.hypot(t.x, t.z);
+    if (tr > TARGET_MAX_R) {
+      const k = TARGET_MAX_R / tr;
+      const dx = t.x - t.x * k, dz = t.z - t.z * k;
+      t.x -= dx; t.z -= dz;
+      this.camera.position.x -= dx; this.camera.position.z -= dz;
+    }
+    const p = this.camera.position;
+    const cr = Math.hypot(p.x, p.z);
+    if (cr > CAMERA_MAX_R) {
+      const k = CAMERA_MAX_R / cr;
+      p.x *= k; p.z *= k;
+    }
+    if (p.y < 4) p.y = 4; // never dip below the ground plane
+  }
+
   // ── frame update: day cycle + ambient animation ────────────────────────────
   update(dt) {
     this.time += dt;
@@ -1124,6 +1148,11 @@ export class City {
     // controls.update() at the same time makes the camera zoom in and spring
     // back. Skip it until the tween finishes and hands over a settled state.
     if (!this.flying) this.controls.update();
+
+    // Keep the camera and its look-at target inside the playable area so the
+    // edge of the ground disc is never in frame. Applies to every input
+    // (mouse orbit/zoom/pan and keyboard), so no control can reveal the rim.
+    if (!this.flying) this._clampToBounds();
 
     this.shadowRefresh += dt;
     if (this.shadowRefresh >= 1 / VISUAL_QUALITY.shadowUpdateHz) {
