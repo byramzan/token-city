@@ -1,19 +1,19 @@
 // Versioned Game Coin conversion rule (fixed rate).
 //
-// Fixed exchange rate: 1000 project tokens == 1 Game Coin.
-//   deposit:    tokens = coins * 1000                (no fee — 1000 tokens buy 1 coin)
-//   withdrawal: tokens = coins * 1000                (no fee — 1 coin returns 1000 tokens)
-//   credit:     coins  = floor(tokens / 1000)        (leftover tokens < 1000 carry no coin)
+// Fixed exchange rate: 100 project tokens == 1 Game Coin.
+//   deposit:    tokens = coins * 100                 (no fee — 100 tokens buy 1 coin)
+//   withdrawal: tokens = coins * 100                 (no fee — 1 coin returns 100 tokens)
+//   credit:     coins  = floor(tokens / 100)         (leftover tokens < 100 carry no coin)
 //
 // There is no bonding curve, no price impact and no fee on either side. The rate
 // is constant, so quotes never drift and there is nothing to deviate from. Every
 // quote records CONVERSION_RULE_VERSION so a future rate change is auditable per
 // deposit and per withdrawal.
 
-export const CONVERSION_RULE_VERSION = 'tcity-fixed-1000to1-v1';
+export const CONVERSION_RULE_VERSION = 'tcity-fixed-100to1-v1';
 
 // Project tokens per one Game Coin. Whole-token unit (not raw on-chain units).
-export const TOKENS_PER_COIN = 1000;
+export const TOKENS_PER_COIN = 100;
 
 // No fee on the reverse conversion (coins -> tokens).
 export const WITHDRAWAL_FEE_PCT = 0;
@@ -66,7 +66,7 @@ export function withdrawalTokensFor(coins, { tokensPerCoin = TOKENS_PER_COIN } =
 }
 
 /** Game Coins credited for a verified on-chain deposit of `tokens`.
- *  Leftover tokens below one whole coin (1000) carry no coin. */
+ *  Leftover tokens below one whole coin (100) carry no coin. */
 export function coinsForTokens(tokens, { tokensPerCoin = TOKENS_PER_COIN } = {}) {
   const coins = Math.floor(Number(tokens) / tokensPerCoin);
   return { coins, price: 1 / tokensPerCoin, conversionRuleVersion: CONVERSION_RULE_VERSION };

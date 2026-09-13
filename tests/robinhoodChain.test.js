@@ -21,7 +21,7 @@ import {
 import { createDepositQuote, approvalPlan, depositIdHash } from '../server/chain/quotes.js';
 import { evaluateDeposit, DEPOSIT_REJECTIONS } from '../server/chain/depositVerification.js';
 import { createChallenge, checkChallengeFields, buildChallengeMessage } from '../server/chain/siwe.js';
-import { CONVERSION_RULE_VERSION, fundingTokensFor, withdrawalTokensFor } from '../server/conversion.js';
+import { CONVERSION_RULE_VERSION, coinsForTokens, fundingTokensFor, withdrawalTokensFor } from '../server/conversion.js';
 
 const TOKEN = '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed';
 const VAULT = '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359';
@@ -352,16 +352,22 @@ test('a wallet challenge carries every required SIWE field and is single use', (
   assert.match(checkChallengeFields({ challenge: { ...challenge, used: true }, walletAddress: WALLET, chainId: 46630, now: 2_000 }), /already used/);
 });
 
-test('the conversion rule is versioned and applies the fixed 1000:1 rate with no fee', () => {
+test('the conversion rule is versioned and applies the fixed 100:1 rate with no fee', () => {
+  assert.equal(fundingTokensFor(1).tokens, 100);
+  assert.equal(withdrawalTokensFor(1).tokens, 100);
+  assert.equal(coinsForTokens(99).coins, 0);
+  assert.equal(coinsForTokens(100).coins, 1);
+  assert.equal(coinsForTokens(199).coins, 1);
+  assert.equal(coinsForTokens(1000).coins, 10);
   const funding = fundingTokensFor(1000);
   const withdrawal = withdrawalTokensFor(1000);
   assert.equal(funding.conversionRuleVersion, CONVERSION_RULE_VERSION);
   assert.equal(withdrawal.conversionRuleVersion, CONVERSION_RULE_VERSION);
   assert.ok(Number.isInteger(funding.tokens) && funding.tokens > 0);
-  // Fixed rate: 1000 tokens == 1 coin, both directions, no fee.
-  assert.equal(funding.tokens, 1000 * 1000);
+  // Fixed rate: 100 tokens == 1 coin, both directions, no fee.
+  assert.equal(funding.tokens, 1000 * 100);
   assert.equal(funding.feePct, 0);
   assert.equal(withdrawal.feePct, 0);
-  assert.equal(withdrawal.tokens, 1000 * 1000);
+  assert.equal(withdrawal.tokens, 1000 * 100);
   assert.equal(funding.tokens, withdrawal.tokens);
 });
