@@ -97,6 +97,19 @@ export function consolePage(environment) {
 </section>
 
 <section class="card">
+  <h2>Site visibility (kill switch)</h2>
+  <p>Turn the entire game into a black screen for every visitor. Use this to
+     take the site down instantly. It applies to everyone within a few seconds
+     and survives reloads until you turn it back on.</p>
+  <p>Current state: <span id="blackout-pill" class="pill">…</span></p>
+  <div class="actions">
+    <button id="blackout-on">Hide site (black screen)</button>
+    <button id="blackout-off" class="secondary">Show site</button>
+  </div>
+  <div id="blackout-status" class="status"></div>
+</section>
+
+<section class="card">
   <h2>1 · Add a token</h2>
   <p>Enter only the token contract address. The software reads its name, symbol,
      decimals and total supply from the chain automatically, and uses the
@@ -296,7 +309,34 @@ async function loadAudit() {
   }
 }
 
-async function refreshAll() { await Promise.all([loadConfigs(), loadHealth(), loadAudit()]); }
+async function loadBlackout() {
+  try {
+    const { blackout } = await call('blackout-get', {}, 'GET');
+    const pill = $('blackout-pill');
+    pill.textContent = blackout ? 'SITE HIDDEN' : 'SITE VISIBLE';
+    pill.className = 'pill ' + (blackout ? 'PAUSED' : 'ACTIVE');
+    $('blackout-on').disabled = blackout;
+    $('blackout-off').disabled = !blackout;
+  } catch (error) {
+    say('blackout-status', error.message, 'error');
+  }
+}
+
+async function setBlackout(enabled) {
+  say('blackout-status', enabled ? 'Hiding the site for everyone…' : 'Restoring the site…');
+  try {
+    await call('blackout-set', { enabled });
+    say('blackout-status', enabled ? 'The site is now a black screen for every visitor.' : 'The site is visible again.', 'ok');
+    await loadBlackout();
+  } catch (error) {
+    say('blackout-status', error.message, 'error');
+  }
+}
+
+$('blackout-on').addEventListener('click', () => setBlackout(true));
+$('blackout-off').addEventListener('click', () => setBlackout(false));
+
+async function refreshAll() { await Promise.all([loadConfigs(), loadHealth(), loadAudit(), loadBlackout()]); }
 $('refresh').addEventListener('click', refreshAll);
 if (await session()) await refreshAll();
 `);

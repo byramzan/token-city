@@ -13,7 +13,7 @@ import {
   bodyOf, clientIpHash, csrfValid, newRequestId, originAllowed, rateLimit, secureJson,
 } from '../server/httpSecurity.js';
 
-const READ_ACTIONS = new Set(['list', 'health', 'audit', 'environment']);
+const READ_ACTIONS = new Set(['list', 'health', 'audit', 'environment', 'blackout-get']);
 
 export default async function handler(request, response) {
   if (!['GET', 'POST'].includes(request.method)) {
@@ -103,6 +103,20 @@ export default async function handler(request, response) {
         sourceIpHash,
       });
       return secureJson(response, 200, { config: result, requestId }, { noindex: true });
+    }
+
+    if (action === 'blackout-get') {
+      const flag = await convex.query(api.chain.siteBlackout, {});
+      return secureJson(response, 200, { blackout: Boolean(flag?.enabled), updatedAt: flag?.updatedAt || null, requestId }, { noindex: true });
+    }
+
+    if (action === 'blackout-set') {
+      const result = await convex.mutation(api.chain.setSiteBlackout, {
+        serviceSecret,
+        enabled: Boolean(body.enabled),
+        adminUserId: context.adminUserId,
+      });
+      return secureJson(response, 200, { ...result, requestId }, { noindex: true });
     }
 
     return secureJson(response, 400, { error: `Unknown admin action “${action}”`, requestId }, { noindex: true });

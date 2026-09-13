@@ -13,6 +13,11 @@ export default async function handler(request, response) {
   const network = networkForEnvironment(process.env.VERCEL_ENV, process.env.RHC_ENVIRONMENT);
   try {
     const config = await convexClient().query(api.chain.activeTokenConfig, { environment: network.networkType });
+    let blackout = false;
+    try {
+      const flag = await convexClient().query(api.chain.siteBlackout, {});
+      blackout = Boolean(flag?.enabled);
+    } catch { /* a flag read failure must never take the whole site down */ }
     return secureJson(response, 200, {
       network: {
         networkName: network.networkName,
@@ -25,6 +30,7 @@ export default async function handler(request, response) {
       },
       token: config,
       status: config ? config.status : 'UNCONFIGURED',
+      blackout,
       walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID || null,
     });
   } catch (error) {

@@ -3337,7 +3337,40 @@ function resetTestBalance() {
 }
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
+/** Live kill switch: an already-open page goes black within seconds when an
+ *  admin flips the flag. Fails open on any read error. */
+function startBlackoutWatch() {
+  const applyBlack = () => {
+    if (window.__DSH_BLACKOUT__) return;
+    window.__DSH_BLACKOUT__ = true;
+    document.documentElement.style.background = '#000';
+    if (document.body) {
+      document.body.style.background = '#000';
+      const cover = document.createElement('div');
+      cover.setAttribute('style', 'position:fixed;inset:0;background:#000;z-index:2147483647');
+      document.body.appendChild(cover);
+    }
+    // Reload after a moment so the game fully stops behind the black screen.
+    setTimeout(() => { try { location.reload(); } catch { /* ignore */ } }, 800);
+  };
+  const check = async () => {
+    try {
+      const res = await fetch('/api/site-blackout', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data && data.blackout === true) applyBlack();
+      }
+    } catch { /* fail open */ }
+  };
+  setInterval(check, 15000);
+}
+
 async function boot() {
+  // Admin kill switch: if the head guard already blacked out the site, do not
+  // boot the game at all. (The head guard paints the black screen; this stops
+  // any game work behind it.)
+  if (typeof window !== 'undefined' && window.__DSH_BLACKOUT__) return;
+  startBlackoutWatch();
   applyStaticUi();
   renderPublicContractAddress();
   void refreshPublicContractAddress();

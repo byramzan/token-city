@@ -6,6 +6,39 @@
   <title>Token City — a cozy low-poly crypto town</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏙️</text></svg>" />
   <link rel="stylesheet" href="/src/styles.css" />
+  <script>
+    // Admin kill switch: if the site is blacked out, paint a full black screen
+    // as early as possible and stop the game from booting. Fails open — a flag
+    // read error never blacks out the site on its own.
+    (function () {
+      function black() {
+        try {
+          document.documentElement.style.background = '#000';
+          var kill = function () {
+            if (!document.body) { return; }
+            document.body.style.background = '#000';
+            document.body.innerHTML = '';
+            var d = document.createElement('div');
+            d.setAttribute('style', 'position:fixed;inset:0;background:#000;z-index:2147483647');
+            document.body.appendChild(d);
+          };
+          if (document.body) { kill(); }
+          else { document.addEventListener('DOMContentLoaded', kill); }
+          window.__DSH_BLACKOUT__ = true;
+        } catch (e) { /* ignore */ }
+      }
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/site-blackout', false); // sync: decide before render
+        xhr.timeout = 4000;
+        xhr.send();
+        if (xhr.status === 200) {
+          var data = JSON.parse(xhr.responseText || '{}');
+          if (data && data.blackout === true) { black(); }
+        }
+      } catch (e) { /* fail open: show the site */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app">

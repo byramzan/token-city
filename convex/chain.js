@@ -42,6 +42,36 @@ async function authorize(ctx, { accountId, sessionToken }) {
   return row;
 }
 
+// ── site-wide operational flags (admin kill switch) ─────────────────────────
+async function siteFlagRow(ctx, flagId) {
+  return ctx.db.query('siteFlags').withIndex('by_flag_id', (q) => q.eq('flagId', flagId)).first();
+}
+
+/** Public: is the whole site blacked out? Read by the game on boot. */
+export const siteBlackout = query({
+  args: {},
+  handler: async (ctx) => {
+    const row = await siteFlagRow(ctx, 'blackout');
+    return { enabled: Boolean(row?.enabled), updatedAt: row?.updatedAt || null };
+  },
+});
+
+/** Service: toggle the site blackout kill switch (admin only). */
+export const setSiteBlackout = mutation({
+  args: { serviceSecret: v.string(), enabled: v.boolean(), adminUserId: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    assertService(args.serviceSecret);
+    const now = Date.now();
+    const row = await siteFlagRow(ctx, 'blackout');
+    if (row) {
+      await ctx.db.patch(row._id, { enabled: args.enabled, updatedAt: now, updatedBy: args.adminUserId || null });
+    } else {
+      await ctx.db.insert('siteFlags', { flagId: 'blackout', enabled: args.enabled, updatedAt: now, updatedBy: args.adminUserId || null });
+    }
+    return { enabled: args.enabled, updatedAt: now };
+  },
+});
+
 // ── token configuration ─────────────────────────────────────────────────────
 async function activeConfigRow(ctx, environment) {
   return ctx.db.query('tokenConfigs')

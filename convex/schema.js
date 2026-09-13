@@ -252,4 +252,12 @@ export default defineSchema({
   })
     .index('by_event_id', ['eventId'])
     .index('by_account', ['accountId', 'serverTimestamp']),
+  // Operational site-wide flags (singleton keyed by flagId). Used by the admin
+  // kill switch that can black out the whole site for every visitor.
+  siteFlags: defineTable({
+    flagId: v.string(),               // e.g. 'blackout'
+    enabled: v.boolean(),
+    updatedAt: v.number(),
+    updatedBy: v.union(v.string(), v.null()),
+  }).index('by_flag_id', ['flagId']),
 });

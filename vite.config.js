@@ -98,10 +98,17 @@ export default defineConfig({
         };
         try {
           const token = await convexCall('query', 'chain:activeTokenConfig', { environment: network.networkType });
-          return json(response, 200, { ...shell, token, status: token ? token.status : 'UNCONFIGURED' });
+          let blackout = false;
+          try { blackout = Boolean((await convexCall('query', 'chain:siteBlackout', {}))?.enabled); } catch { /* fail open */ }
+          return json(response, 200, { ...shell, token, status: token ? token.status : 'UNCONFIGURED', blackout });
         } catch (error) {
           return json(response, 200, { ...shell, token: null, status: 'UNAVAILABLE', detail: error.message });
         }
+      });
+
+      server.middlewares.use('/api/site-blackout', async (request, response) => {
+        try { return json(response, 200, { blackout: Boolean((await convexCall('query', 'chain:siteBlackout', {}))?.enabled) }); }
+        catch { return json(response, 200, { blackout: false }); }
       });
 
       server.middlewares.use('/api/token-admin', async (request, response) => {
@@ -163,6 +170,15 @@ export default defineConfig({
                 sourceIpHash: 'dev',
               }),
             });
+          }
+          if (action === 'blackout-get') {
+            const flag = await convexCall('query', 'chain:siteBlackout', {});
+            return json(response, 200, { blackout: Boolean(flag?.enabled), updatedAt: flag?.updatedAt || null });
+          }
+          if (action === 'blackout-set') {
+            return json(response, 200, await convexCall('mutation', 'chain:setSiteBlackout', {
+              serviceSecret, enabled: Boolean(body.enabled), adminUserId: 'admin_dev',
+            }));
           }
           return json(response, 400, { error: `Unknown admin action “${action}”` });
         } catch (error) {
