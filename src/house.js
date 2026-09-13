@@ -636,18 +636,28 @@ export function createCompanion(type, sc, signText) {
   }
   order++;
 
-  // big sign above the entrance — glows at night. Seated on the upper wall
-  // face, safely below the roofline so it never clips into the eaves/gable.
-  const signY = 0.35 + H - 0.55;
+  // big sign above the entrance — glows at night. It is mounted on a short
+  // bracket that stands PROUD of the roof overhang (prism roofs reach past the
+  // wall front), so the text is never hidden under the eaves and never
+  // z-fights the soffit. Sized to fit the clear band above the window.
+  const signW = 2.4, signH = 0.62;
+  const signY = 0.35 + H - 0.42;          // clear of the window below, under the ridge
+  const signZ = D / 2 + 0.55;             // in front of the roof overhang (front edge ≈ D/2+0.35)
   const signMat = new THREE.MeshBasicMaterial({ map: signTexture(signText, sc.accent, '#ffffff'), toneMapped: false });
-  const signBoard = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.8), signMat);
-  signBoard.position.set(0, signY, D / 2 + 0.16);
+  const signBack = add(box(signW + 0.16, signH + 0.14, 0.1, sc.trim));
+  signBack.position.set(0, signY, signZ);
+  const signBoard = new THREE.Mesh(new THREE.PlaneGeometry(signW, signH), signMat);
+  signBoard.position.set(0, signY, signZ + 0.06);
+  signBoard.renderOrder = 3;              // draw on top: never let the roof win the depth test
   add(signBoard);
-  const signBack = add(box(2.75, 0.92, 0.1, sc.trim));
-  signBack.position.set(0, signY, D / 2 + 0.08);
-  const signGlow = new THREE.Mesh(new THREE.BoxGeometry(2.85, 0.1, 0.08),
+  // Two small brackets tie the sign back to the wall so it reads as mounted.
+  for (const bx of [-1, 1]) {
+    const bracket = add(box(0.08, 0.08, 0.5, shade(sc.trim, -14)));
+    bracket.position.set(bx * (signW / 2 - 0.2), signY, D / 2 + 0.3);
+  }
+  const signGlow = new THREE.Mesh(new THREE.BoxGeometry(signW + 0.2, 0.08, 0.08),
     new THREE.MeshStandardMaterial({ color: '#ffd98a', emissive: '#ffd98a', emissiveIntensity: 0.3, flatShading: true }));
-  signGlow.position.set(0, signY + 0.52, D / 2 + 0.12);
+  signGlow.position.set(0, signY - signH / 2 - 0.08, signZ + 0.02);
   signMats.push(signGlow.material);
   add(signGlow);
   order++;

@@ -1056,17 +1056,34 @@ export class City {
     // points from the origin out to the plot, so we step back TOWARD the origin.
     const dir = new THREE.Vector3(target.x, 0, target.z).normalize();
     if (dir.lengthSq() < 0.01) dir.set(0.7, 0, 0.7);
+    const endTgt = new THREE.Vector3(target.x, 2.2, target.z);
     const endPos = new THREE.Vector3(
       target.x - dir.x * distance * 0.8, height, target.z - dir.z * distance * 0.8,
     );
-    const endTgt = new THREE.Vector3(target.x, 2.2, target.z);
+    // Keep the landing spot inside the OrbitControls distance band so the
+    // controls do not snap the camera back the instant the tween hands over.
+    const offset = endPos.clone().sub(endTgt);
+    const clamped = Math.min(this.controls.maxDistance, Math.max(this.controls.minDistance, offset.length()));
+    endPos.copy(endTgt).add(offset.setLength(clamped));
+
+    if (this.camTween) this.camTween.cancel();
+    // While flying we own the camera; the damped controls.update() must not
+    // fight the tween (that caused the zoom-in/spring-back jitter on load).
+    this.flying = true;
     this.camTween = tween({
       duration, ease: Ease.inOut,
       onUpdate: (k) => {
         this.camera.position.lerpVectors(startPos, endPos, k);
         this.controls.target.lerpVectors(startTgt, endTgt, k);
+        this.camera.lookAt(this.controls.target);
       },
-      onDone,
+      onDone: () => {
+        this.flying = false;
+        this.camTween = null;
+        // Hand a settled state to the controls so nothing jumps next frame.
+        this.controls.update();
+        onDone?.();
+      },
     });
   }
 
@@ -1076,12 +1093,16 @@ export class City {
       this.camTween.cancel();
       this.camTween = null;
     }
+    this.flying = false;
   }
 
   // ── frame update: day cycle + ambient animation ────────────────────────────
   update(dt) {
     this.time += dt;
-    this.controls.update();
+    // A fly tween owns the camera; running the damped, distance-clamping
+    // controls.update() at the same time makes the camera zoom in and spring
+    // back. Skip it until the tween finishes and hands over a settled state.
+    if (!this.flying) this.controls.update();
 
     this.shadowRefresh += dt;
     if (this.shadowRefresh >= 1 / VISUAL_QUALITY.shadowUpdateHz) {
