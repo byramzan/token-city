@@ -4,7 +4,7 @@
 
 // Enough for the visible 500 / 1,000 / 2,500 quick-funding options at the
 // simulated launch price. Real wallets still use their actual provider balance.
-export const TOKEN = { name: 'TCITY', startDemoBalance: 5000000, demoBalanceVersion: 3 };
+export const TOKEN = { name: 'TCITY', startDemoBalance: 1000000, demoBalanceVersion: 4 };
 export const COINS = { name: 'coins', rate: 1 };
 
 export const LEVELS = [

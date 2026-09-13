@@ -21,7 +21,7 @@ import {
   nameTaken, addHouse, interiorOf, placementsOf, householdOf, addInventory,
   takeInventory, auditLog, MAX_LINKED_WALLETS, savePlacementsRevision,
   archiveCurrentAccount, restoreAccountForWallet,
-  applyPublicChainConfig,
+  applyPublicChainConfig, makeDemoAddress,
 } from './state.js';
 import {
   balancesOf, balance, acct, storeSpend, fundHousehold, returnHousehold,
@@ -964,6 +964,13 @@ $('btn-wallet').addEventListener('click', () => {
   sfx.click();
   if (state.account) { renderAccount(); showPanel('modal-account'); }
   else openWalletModal('connect');
+});
+
+// Temporary demo wallet (for screenshots/testing). Grants a test-token balance
+// (TOKEN.startDemoBalance) with no real chain link. Removed on the reset step.
+$('wallet-demo')?.addEventListener('click', () => {
+  sfx.click();
+  finishConnect(makeDemoAddress(), 'demo', { chainFamily: 'demo' });
 });
 
 // ── Account panel (task4 §15) ────────────────────────────────────────────────

@@ -640,9 +640,13 @@ export function createCompanion(type, sc, signText) {
   // bracket that stands PROUD of the roof overhang (prism roofs reach past the
   // wall front), so the text is never hidden under the eaves and never
   // z-fights the soffit. Sized to fit the clear band above the window.
-  const signW = 2.4, signH = 0.62;
-  const signY = 0.35 + H - 0.42;          // clear of the window below, under the ridge
-  const signZ = D / 2 + 0.55;             // in front of the roof overhang (front edge ≈ D/2+0.35)
+  // The tall prism roof (W+0.7 × 1.1 × D+0.7 at y=0.35+H) reaches an eave at
+  // z=(D+0.7)/2=1.85 and its base sits at y=0.35+H. The sign is therefore kept
+  // BELOW that base and pushed clearly FORWARD of the eave so it can never
+  // poke into the roof on the small single-storey shops.
+  const signW = 2.3, signH = 0.5;
+  const signY = 0.35 + H - 0.5;           // top ≈ 0.35+H-0.25, safely below the roof base
+  const signZ = D / 2 + 0.72;             // well in front of the eave (≈ D/2+0.35)
   const signMat = new THREE.MeshBasicMaterial({ map: signTexture(signText, sc.accent, '#ffffff'), toneMapped: false });
   const signBack = add(box(signW + 0.16, signH + 0.14, 0.1, sc.trim));
   signBack.position.set(0, signY, signZ);
@@ -652,8 +656,8 @@ export function createCompanion(type, sc, signText) {
   add(signBoard);
   // Two small brackets tie the sign back to the wall so it reads as mounted.
   for (const bx of [-1, 1]) {
-    const bracket = add(box(0.08, 0.08, 0.5, shade(sc.trim, -14)));
-    bracket.position.set(bx * (signW / 2 - 0.2), signY, D / 2 + 0.3);
+    const bracket = add(box(0.08, 0.08, 0.74, shade(sc.trim, -14)));
+    bracket.position.set(bx * (signW / 2 - 0.2), signY, D / 2 + 0.4);
   }
   const signGlow = new THREE.Mesh(new THREE.BoxGeometry(signW + 0.2, 0.08, 0.08),
     new THREE.MeshStandardMaterial({ color: '#ffd98a', emissive: '#ffd98a', emissiveIntensity: 0.3, flatShading: true }));
