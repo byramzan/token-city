@@ -352,19 +352,16 @@ test('a wallet challenge carries every required SIWE field and is single use', (
   assert.match(checkChallengeFields({ challenge: { ...challenge, used: true }, walletAddress: WALLET, chainId: 46630, now: 2_000 }), /already used/);
 });
 
-test('the conversion rule is versioned and applies the fixed 100:1 rate with a 5% withdrawal fee', () => {
+test('the conversion rule is versioned and applies the fixed 1000:1 rate with no fee', () => {
   const funding = fundingTokensFor(1000);
   const withdrawal = withdrawalTokensFor(1000);
   assert.equal(funding.conversionRuleVersion, CONVERSION_RULE_VERSION);
   assert.equal(withdrawal.conversionRuleVersion, CONVERSION_RULE_VERSION);
   assert.ok(Number.isInteger(funding.tokens) && funding.tokens > 0);
-  // Deposit: 100 tokens == 1 coin, no fee.
-  assert.equal(funding.tokens, 1000 * 100);
+  // Fixed rate: 1000 tokens == 1 coin, both directions, no fee.
+  assert.equal(funding.tokens, 1000 * 1000);
   assert.equal(funding.feePct, 0);
-  // Withdrawal: 100 tokens per coin less a flat 5% fee.
-  assert.equal(withdrawal.feePct, 5);
-  assert.equal(withdrawal.tokens, Math.floor(1000 * 100 * 0.95));
-  assert.ok(withdrawal.tokens < funding.tokens);
-  // No Solana base-unit constant leaked into the EVM path.
-  assert.equal(JSON.stringify(funding).includes('1000000000'), false);
+  assert.equal(withdrawal.feePct, 0);
+  assert.equal(withdrawal.tokens, 1000 * 1000);
+  assert.equal(funding.tokens, withdrawal.tokens);
 });

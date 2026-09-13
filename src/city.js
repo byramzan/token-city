@@ -1050,10 +1050,14 @@ export class City {
   flyTo(target, { distance = 18, height = 11, duration = 1400, onDone } = {}) {
     const startPos = this.camera.position.clone();
     const startTgt = this.controls.target.clone();
+    // A house is rotated so its front (the door, +z face) points toward the
+    // world origin (the street/plaza). To show the FRONT of the house the
+    // camera must sit on the origin side of the plot, not behind it. `dir`
+    // points from the origin out to the plot, so we step back TOWARD the origin.
     const dir = new THREE.Vector3(target.x, 0, target.z).normalize();
     if (dir.lengthSq() < 0.01) dir.set(0.7, 0, 0.7);
     const endPos = new THREE.Vector3(
-      target.x + dir.x * distance * 0.8, height, target.z + dir.z * distance * 0.8,
+      target.x - dir.x * distance * 0.8, height, target.z - dir.z * distance * 0.8,
     );
     const endTgt = new THREE.Vector3(target.x, 2.2, target.z);
     this.camTween = tween({

@@ -636,16 +636,18 @@ export function createCompanion(type, sc, signText) {
   }
   order++;
 
-  // big sign above the entrance — glows at night
+  // big sign above the entrance — glows at night. Seated on the upper wall
+  // face, safely below the roofline so it never clips into the eaves/gable.
+  const signY = 0.35 + H - 0.55;
   const signMat = new THREE.MeshBasicMaterial({ map: signTexture(signText, sc.accent, '#ffffff'), toneMapped: false });
   const signBoard = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.8), signMat);
-  signBoard.position.set(0, 0.35 + H - 0.15, D / 2 + 0.16);
+  signBoard.position.set(0, signY, D / 2 + 0.16);
   add(signBoard);
   const signBack = add(box(2.75, 0.92, 0.1, sc.trim));
-  signBack.position.set(0, 0.35 + H - 0.15, D / 2 + 0.08);
+  signBack.position.set(0, signY, D / 2 + 0.08);
   const signGlow = new THREE.Mesh(new THREE.BoxGeometry(2.85, 0.1, 0.08),
     new THREE.MeshStandardMaterial({ color: '#ffd98a', emissive: '#ffd98a', emissiveIntensity: 0.3, flatShading: true }));
-  signGlow.position.set(0, 0.35 + H + 0.42, D / 2 + 0.12);
+  signGlow.position.set(0, signY + 0.52, D / 2 + 0.12);
   signMats.push(signGlow.material);
   add(signGlow);
   order++;
