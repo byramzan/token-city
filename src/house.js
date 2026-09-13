@@ -668,8 +668,11 @@ export function createCompanion(type, sc, signText) {
 
   // themed props in the open zone before the entrance
   if (type === 'cafe') {
+    // Awning sits LOW over the window and forward of the roof eave (eave is at
+    // z=(D+0.7)/2≈1.85, roof base at y=0.35+H≈2.65). Keeping it around y≈1.95
+    // and z≈D/2+0.75 means it never tucks under the overhang or pokes the roof.
     const awn = add(box(2.2, 0.08, 0.9, sc.accent));
-    awn.position.set(W / 4, 0.35 + 1.95, D / 2 + 0.5);
+    awn.position.set(W / 4, 0.35 + 1.55, D / 2 + 0.75);
     awn.rotation.x = 0.25;
     const table = add(new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.07, 8), mat('#f0ead9')));
     table.position.set(-0.4, 1.05, D / 2 + 1.5);
