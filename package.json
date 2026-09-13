@@ -15,6 +15,7 @@
     "verify:task7": "node scripts/verify-task7.mjs",
     "compile:contracts": "node scripts/compileContracts.mjs",
     "setup:testnet-wallets": "node scripts/setup-testnet-wallets.mjs",
+    "setup:mainnet-wallets": "node scripts/setup-mainnet-wallets.mjs",
     "deploy:mainnet-vault": "node scripts/deploy-mainnet-vault.mjs"
   },
   "keywords": [],
